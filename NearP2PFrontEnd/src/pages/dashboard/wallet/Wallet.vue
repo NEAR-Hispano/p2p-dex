@@ -46,7 +46,7 @@
                 <p class="balance-near">$ {{ lastPrice.lastPrice | numericFormat(numericFormatConfig) }}</p>
               </a-col>
             </a-row>
-            <a-row type="flex" style="margin-top: 50px">
+            <a-row type="flex" style="margin-top: 50px; display: none">
               <a-col :xxl="14" :xl="14" :lg="14" :md="14" :sm="14" :xs="24">
                 <p style="font-size: 18px">
                   Wallet Fee Balance:
@@ -215,6 +215,8 @@ export default {
   },
   async mounted() {
     await this.getTransactions()
+    this.fetch();
+    this.getBalance();
   },
   methods: {
     goToSend() {

@@ -69,6 +69,34 @@ const options = {
           },
           component: () => import('@/pages/form/account'),
         },
+        {
+          path: 'Settings',
+          name: 'Settings',
+          meta: {
+            icon: 'setting',
+            page: {
+              cacheAble: false
+            }
+          },
+          component: PageView,
+          children: [
+            {
+              path: 'basic',
+              name: '基础表单',
+              component: () => import('@/pages/form/basic'),
+            },
+            {
+              path: 'step',
+              name: '分步表单',
+              component: () => import('@/pages/form/step'),
+            },
+            {
+              path: 'advance',
+              name: '高级表单',
+              component: () => import('@/pages/form/advance'),
+            }
+          ]
+        },
       ],
     },
   ]

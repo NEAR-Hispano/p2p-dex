@@ -32,7 +32,7 @@
         <a-row type="flex">
           <a-col :xxl="8" :xl="8" :lg="8" :md="24" :sm="24" :xs="24">
             <span style="color:gray; font-size: 12px"
-              >{{ limit }} min - max:</span
+              >{{ limit }}:</span
             >
           </a-col>
           <a-col :xxl="8" :xl="8" :lg="8" :md="24" :sm="24" :xs="24">
@@ -102,7 +102,7 @@
             </a-col>
             <a-col :xxl="8" :xl="8" :lg="24" :md="24" :sm="24" :xs="24">
               <p style="color:gray; font-size: 12px">
-                {{ $t('price') }}: <span style="color:rgb(218, 25, 25)">{{ price }}  USD</span>
+                {{ $t('price') }}: <span style="color:rgb(218, 25, 25)">{{ price }} USD</span>
               </p>
             </a-col>
             <a-col :xxl="8" :xl="8" :lg="24" :md="24" :sm="24" :xs="24">
@@ -142,7 +142,7 @@
                       :sm="24"
                       :xs="24"
                     >
-                      <a-form-item :label="$t('sellUsdt')">
+                      <a-form-item :label="$t('sellNEAR')">
                         <a-input-number
                           style="width:100%"
                           @change="onChangeToken"
@@ -248,7 +248,7 @@
                       :sm="24"
                       :xs="24"
                     >
-                      <a-form-item :label="$t('sellUsdt')">
+                      <a-form-item :label="$t('sellNEAR')">
                         <p
                           style="font-size: 16px; color: black; font-weigth: bold; margin-left:30px"
                         >
@@ -374,9 +374,9 @@ export default {
       loading: false,
       title: "",
       filter_value: "asset",
-      value: "USDT",
+      value: "NEAR",
       typeoffer: "sell",
-      buttonText: this.$t("sellUsdt"),
+      buttonText: this.$t("sellNEAR"),
       available: this.$t("available"),
       limit: this.$t("limit"),
       orders: this.$t("orders"),
@@ -452,7 +452,7 @@ export default {
             campo: this.filter_value,
             valor: this.value.toString()
           });
-          this.buttonText = this.$t("sellUsdt");
+          this.buttonText = this.$t("sellNEAR");
           console.log(this.data);
         } else {
           this.data = await contract.get_offers_buy({
