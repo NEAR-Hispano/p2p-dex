@@ -1,0 +1,244 @@
+.flip-card__top,
+.flip-card__bottom,
+.flip-card__back-bottom,
+.flip-card__back::before,
+.flip-card__back::after {
+  color: #fafafa !important;
+  background: black !important;
+}
+
+.payment {
+  font-size: 16px;
+}
+
+.button-near{
+  background-color: rgb(39, 39, 41) !important;
+  border-color: rgb(39, 39, 41) !important;
+}
+
+.button-near:hover{
+  background-color: black;
+  border-color: black;
+}
+
+.payment-detail{
+  font-weight: bold;
+  color: rgb(118, 207, 118);
+}
+
+.wrapper {
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto;
+
+
+  header {
+    background-color: black;
+    height: 65px;
+    min-height: 60px;
+    color: white;
+    width: 90%;
+    max-width: 650px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 99;
+    padding: 10px;
+    box-sizing: border-box;
+    border-top-right-radius: 8px;
+    border-top-left-radius: 8px;
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 30vh;
+    width: 90%;
+    background-color: #ebedf0;
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+
+    main {
+      padding: 1px;
+      height: 60vh;
+      overflow-y: scroll;
+      display: flex;
+      flex-direction: column;
+
+      &::-webkit-scrollbar {
+        width: 0.25rem;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: rgb(39, 39, 41);
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: rgb(39, 39, 41);
+      }
+    }
+
+    form {
+      height: 10vh;
+      background-color: black;
+      width: 100%;
+      max-width: 650px;
+      display: flex;
+      font-size: 1.5rem;
+      border-radius: 8px;
+
+      button {
+        width: 20%;
+        background-color: black;
+        border-radius: 8px;
+      }
+
+      input {
+        line-height: 1.5;
+        width: 100%;
+        font-size: 1rem;
+        background: black;
+        color: white;
+        outline: none;
+        border: none;
+        padding: 0 10px;
+        border-radius: 8px;
+      }
+    }
+  }
+
+  button {
+    background-color: #282c34; /* near buttom */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    font-size: 2.25rem;
+    border-radius: 8px;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  button,
+  input {
+    color: white;
+    border: none;
+    border-radius: 8px !important;
+  }
+
+  p {
+    max-width: 500px;
+    margin-bottom: 12px;
+    line-height: 24px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    position: relative;
+    color: white;
+    text-align: center;
+  }
+
+  .message {
+    font-size: 1rem;
+    width: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+    display: flex;
+
+    &.received {
+      p {
+        background: rgb(39, 39, 41);
+        color: rgb(217, 218, 205);
+        margin-right: 5px;
+        margin-left: 5px;
+      }
+    }
+
+    &.sent {
+      flex-direction: row-reverse;
+
+      p {
+        color: #fff;
+        background: #0071ce;
+        align-self: flex-end;
+        margin-right: 5px;
+        margin-left: 5px;
+      }
+    }
+
+    &__photo {
+      height: 40vmax;
+      background-size: cover;
+      background-position: center;
+      width: 20rem;
+      border: 1px solid;
+      border-radius: 1rem;
+      cursor: pointer;
+    }
+
+    p {
+      max-width: 500px;
+      margin-bottom: 12px;
+      line-height: 24px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      position: relative;
+      color: #fff;
+      text-align: center;
+    }
+  }
+
+  .send {
+    background-color: gray;
+    padding: 1rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    .photo-preview {
+      width: 5rem;
+      height: 5rem;
+      border: 1px solid;
+      background-position: center;
+      background-size: cover;
+      margin-right: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  }
+
+  .photo-preview {
+    width: 10rem;
+    height: 5rem;
+    border: 1px solid;
+    background-position: center;
+    background-size: cover;
+    margin-right: 0rem;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .photo-sended {
+    width: 14rem;
+    height: 9rem;
+    border: 1px solid;
+    background-position: center;
+    background-size: cover;
+    margin-right: 5px;
+    margin-left: 5px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .photo-sended:hover {
+    width: 55vw;
+    height: 55vh;
+    object-fit: cover;
+  }
+}

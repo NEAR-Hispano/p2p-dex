@@ -1,7 +1,7 @@
 module.exports = {
   messages: {
     ES: {
-      project: 'Transacciones',
+      project: 'Ordenes pendientes',
       ranking: 'Ranqueo',
       access: 'Inicio rápido / Nevegación fácil',
       goodmorning: 'Buenos días',
@@ -14,9 +14,11 @@ module.exports = {
       message5: 'feliz dia',
       message6: 'encantado de verte de nuevo',
       messagelast: 'Última visita',
+      near: 'NEAR',
+      tether: 'Tether USD',
     },
     US: {
-      project: 'Transactions',
+      project: 'Pending orders',
       ranking: 'Ranking',
       access: 'Quick start / Easy navigation',
       goodmorning: 'Good morning',
@@ -29,6 +31,8 @@ module.exports = {
       message5: 'happy day',
       message6: 'nice to see you again',
       messagelast: 'Last seen',
+      near: 'NEAR',
+      tether: 'Tether USD',
     },
   }
 }

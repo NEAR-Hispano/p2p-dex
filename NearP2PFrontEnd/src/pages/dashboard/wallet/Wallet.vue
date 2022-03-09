@@ -6,8 +6,8 @@
       </div>
     </div>
     <template slot="extra">
-      <head-info class="split-right" :title="$t('project')" content="56" />
-      <head-info class="split-right" :title="$t('ranking')" content="8/24" />
+      <head-info class="split-right" style="color:red" :title="$t('project')" content="1" />
+      <head-info class="split-right" :title="$t('ranking')" content="90%" />
     </template>
     <template>
       <a-row type="flex">
@@ -35,7 +35,7 @@
             <a-row type="flex" style="margin-top: 50px">
               <a-col :xxl="14" :xl="14" :lg="14" :md="14" :sm="14" :xs="24">
                 <p style="font-size: 18px">
-                  Wallet Balance:
+                  {{ $t('near') }}
                 </p>
               </a-col>
               <a-col :xxl="10" :xl="10" :lg="10" :md="10" :sm="10" :xs="24">
@@ -46,54 +46,22 @@
                 <p class="balance-near">$ {{ lastPrice.lastPrice | numericFormat(numericFormatConfig) }}</p>
               </a-col>
             </a-row>
-            <a-row type="flex" style="margin-top: 50px; display: none">
+            <a-row type="flex" style="margin-top: 50px;">
               <a-col :xxl="14" :xl="14" :lg="14" :md="14" :sm="14" :xs="24">
                 <p style="font-size: 18px">
-                  Wallet Fee Balance:
+                   {{ $t('tether') }}
                 </p>
               </a-col>
               <a-col :xxl="10" :xl="10" :lg="10" :md="10" :sm="10" :xs="24">
-                <p class="balance">≈ $ {{ balanceblock | numericFormat(numericFormatConfig) }}</p>
-                <p class="balance-near">0.25 NEAR</p>
-              </a-col>
-            </a-row>
-            <a-row type="flex" style="margin-top: 40px; display: none">
-              <a-col :xxl="14" :xl="14" :lg="14" :md="14" :sm="14" :xs="14">
-                <p>
-                  <a-button
-                    type="primary"
-                    size="large"
-                    class="button-near"
-                    @click="goToSend"
-                  >
-                    <img
-                      src="https://img.icons8.com/material-rounded/24/ffffff/filled-sent.png"
-                    />
-                  </a-button>
-                </p>
-                <p>
-                  Send
-                </p>
-              </a-col>
-              <a-col :xxl="10" :xl="10" :lg="10" :md="10" :sm="10" :xs="10">
-                <p>
-                  <a-button type="primary" size="large" class="button-near">
-                    <img
-                      src="https://img.icons8.com/material/24/ffffff/left-down2.png"
-                    />
-                  </a-button>
-                </p>
-                <p>
-                  Receive
-                </p>
+                <p class="balance">= $ {{ tether/1000000 | numericFormat(numericFormatConfig) }}</p>
               </a-col>
             </a-row>
           </a-card>
         </a-col>
         <a-col
-          :xxl="8"
-          :xl="8"
-          :lg="8"
+          :xxl="10"
+          :xl="10"
+          :lg="10"
           :md="24"
           :sm="24"
           :xs="24"
@@ -135,28 +103,20 @@
 import { mapGetters } from "vuex";
 import PageLayout from "@/layouts/PageLayout";
 import HeadInfo from "@/components/tool/HeadInfo";
-import { mapState } from "vuex";
 import * as nearAPI from "near-api-js";
 import { BINANCE_NEAR } from "@/services/api";
 import { CONFIG } from "@/services/api";
-const { connect, keyStores, WalletConnection, providers, utils } = nearAPI;
+const { connect, keyStores, WalletConnection, providers, Contract, utils } = nearAPI;
 const NOMBRE = process.env.VUE_APP_NAME;
-// configuracion de conexion a la red de near
-/*const config = {
-  networkId: "testnet",
-  keyStore: new keyStores.BrowserLocalStorageKeyStore(),
-  nodeUrl: "https://rpc.testnet.near.org",
-  walletUrl: "https://wallet.testnet.near.org",
-  helperUrl: "https://helper.testnet.near.org",
-  explorerUrl: "https://explorer.testnet.near.org",
-};*/
+
 export default {
-  name: "WorkPlace",
+  name: "Wallet",
   components: { HeadInfo, PageLayout },
   i18n: require("./i18n"),
   data() {
     return {
       data: [],
+      tether: [],
       lastPrice: [],
       projects: [],
       loading: true,
@@ -180,8 +140,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("setting", ["lang"]),
-    ...mapGetters("account", ["userInfo", "userInfoLastLogin", "userAvatar"])
+    ...mapGetters("account", ["userInfo", "userAvatar"])
   },
   created() {
     const renderWelcomeMsg = (currentTime = new Date()) => {
@@ -211,17 +170,19 @@ export default {
     ];
     this.welcome.message = message[Math.floor(Math.random() * message.length)];
     this.fetch();
+    setTimeout(this.fetch(), 1000);
+    setTimeout(this.fetch(), 1000);
     this.getBalance();
-  },
-  async mounted() {
-    await this.getTransactions()
-    this.fetch();
-    this.getBalance();
+    this.getBalanceTether();
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+
+    if (urlParams.get('account_id') !== null) {
+      this.$router.push({ path: '/dashboard/wallet', replace: true })
+    }
   },
   methods: {
-    goToSend() {
-      this.$router.push("/dashboard/send");
-    },
     fetch() {
       var request = new XMLHttpRequest();
       request.open("GET", BINANCE_NEAR);
@@ -232,24 +193,45 @@ export default {
     },
     async getBalance() {
       // connect to NEAR
-      const near = await connect(
-        CONFIG(new keyStores.BrowserLocalStorageKeyStore())
-      );
-      // create wallet connection
-      const wallet = new WalletConnection(near, NOMBRE);
+      //console.log(new keyStores.BrowserLocalStorageKeyStore())
+      const near = await connect(CONFIG(new keyStores.BrowserLocalStorageKeyStore()));
+      const wallet = new WalletConnection(near);
+      //console.log(wallet.account());
       if (wallet.isSignedIn()) {
-        // console.log(wallet.getAccountId())
         const accountId = wallet.getAccountId();
         // gets account balance
         const account = await near.account(accountId);
         const balance = await account.getAccountBalance();
-        // console.log(balance)
+        //const amountInNEAR = utils.format.formatNearAmount(balance);
         const dipo = utils.format.formatNearAmount(balance.available);
         const restar = utils.format.formatNearAmount("50000000000000000000000");
         // this.balance = parseFloat(balance.total)/10**24
         this.balance = (dipo - restar).toFixed(5);
+        localStorage.setItem("wallet_balance", this.balance); 
         this.balanceDollar = this.balance * this.lastPrice.lastPrice;
         this.balanceblock = (0.25 * this.lastPrice.lastPrice).toFixed(2);
+      }
+    },
+    async getBalanceTether() {
+      // connect to NEAR
+      const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME_TETHER;
+      const near = await connect(
+        CONFIG(new keyStores.BrowserLocalStorageKeyStore())
+      );
+      // create wallet connection
+      // const account = await near.account();
+      const wallet = new WalletConnection(near);
+      // console.log(near);
+      const contract = new Contract(wallet.account(), CONTRACT_NAME, {
+        viewMethods: ["ft_balance_of"],
+        changeMethods: [],
+        sender: wallet.account()
+      });
+      if (wallet.isSignedIn()) {
+          this.tether = await contract.ft_balance_of({
+            account_id: wallet.getAccountId(),
+          });
+        // console.log("tether", this.tether/1000000);
       }
     },
     async getTransactions() {

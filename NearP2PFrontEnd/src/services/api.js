@@ -1,11 +1,10 @@
 //Cross-domain proxy prefix
 // const API_PROXY_PREFIX='/api'
-// const BASE_URL = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_API_BASE_URL : API_PROXY_PREFIX
+//const BASE_URL = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_API_BASE_URL : API_PROXY_PREFIX
 const BASE_URL = process.env.VUE_APP_API_BASE_URL
-const NETWORK = process.env.NODE_ENV
+const NETWORK = process.env.NODE_ENV === 'development' ? 'testnet' : 'testnet'
 
 function CONFIG(keyStores) {
-  // console.log(NETWORK)
   switch (NETWORK) {
   case 'mainnet':
     return {

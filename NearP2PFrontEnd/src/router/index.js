@@ -4,6 +4,7 @@ import {formatRoutes} from '@/utils/routerUtil'
 
 Vue.use(Router)
 
+
 // Route configurations that do not require login blocking
 const loginIgnore = {
   names: ['404', '403'],      //Matches by route name

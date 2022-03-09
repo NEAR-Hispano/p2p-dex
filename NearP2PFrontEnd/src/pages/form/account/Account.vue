@@ -1,6 +1,5 @@
 <template>
   <div>
-    <page-view></page-view>
     <a-card :title="$t('accountData')" class="card">
       <a-row type="flex">
         <a-col :xxl="4" :xl="4" :lg="4" />
@@ -104,13 +103,9 @@
 </template>
 
 <script>
-import PageView from '@/layouts/PageView'
 
 export default {
   name: "Account",
-  components: {
-     PageView,
-  },
   i18n: require("./i18n"),
   computed: {
     desc() {

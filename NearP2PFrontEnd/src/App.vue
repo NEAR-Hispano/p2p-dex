@@ -11,11 +11,13 @@ import themeUtil from "@/utils/themeUtil";
 import { getI18nKey } from "@/utils/routerUtil";
 import Cookies from 'js-cookie'
 
+
+
 export default {
   name: "App",
   data() {
     return {
-      locale: {}
+      locale: {},
     };
   },
   created() {

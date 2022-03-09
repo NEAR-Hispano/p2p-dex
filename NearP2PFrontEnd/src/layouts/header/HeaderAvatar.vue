@@ -9,6 +9,10 @@
         <a-icon style="margin-right: 8px;" type="poweroff" />
         <span>{{ $t('logout') }}</span>
       </a-menu-item>
+      <a-menu-item @click="account">
+        <a-icon style="margin-right: 8px;" type="user" />
+        <span>{{ $t('account') }}</span>
+      </a-menu-item>
     </a-menu>
   </a-dropdown>
 </template>
@@ -16,6 +20,9 @@
 <script>
 import { mapGetters } from "vuex";
 import { logout } from "@/services/user";
+import * as nearAPI from "near-api-js";
+import { CONFIG } from "@/services/api";
+const { connect, keyStores, WalletConnection } = nearAPI;
 
 export default {
   name: "HeaderAvatar",
@@ -24,10 +31,21 @@ export default {
     ...mapGetters("account", ["userInfo","userInfoLastLogin","userAvatar"])
   },
   methods: {
-    logout() {
+    async logout() {
       logout();
       // logout();
+      // connect to NEAR
+      const near = await connect(
+        CONFIG(new keyStores.BrowserLocalStorageKeyStore())
+      );
+      //const near = await connect(config);
+      // create wallet connection
+      const wallet = new WalletConnection(near);
+      wallet.signOut();
       this.$router.push("/login");
+    },
+    account() {
+      this.$router.push('/trade/account')
     }
   }
 };
