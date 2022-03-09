@@ -17,29 +17,22 @@
 import CommonLayout from "@/layouts/CommonLayout";
 import { avatars } from "@/services/user";
 import { setAuthorization } from "@/utils/request";
-import { mapState, mapMutations } from "vuex";
+import { mapMutations } from "vuex";
+
 
 export default {
-  name: "Login",
+  name: "Redirect",
   components: { CommonLayout },
   i18n: require("./i18n"),
   
   data() {
     return {
-      error: "",
       avatar: avatars[Math.floor((Math.random() * 10))],
-      form: this.$form.createForm(this),
-      wallet: [],
     };
   },
   computed: {
-    ...mapState('setting', ['lang']),
     systemName() {
       return this.$store.state.setting.systemName;
-    },
-    langAlias() {
-      let lang = this.langList.find(item => item.key == this.lang)
-      return lang.alias
     },
   },
   mounted () {
@@ -58,15 +51,14 @@ export default {
   },
   methods: {
     ...mapMutations("account", ["setUser", "setUserInfo", "setUserAvatar"]),
-    ...mapMutations("setting", ["setLang"]),
     afterLogin(res) {
-      var today = new Date();
+      console.log('after login')
+      var today = new Date(); 
       const loginRes = res;
-      // var selFiles = JSON.parse(selFiles);
       this.setUserInfo(loginRes.get('account_id'))
       this.setUser(loginRes.get('account_id'))
       this.setUserAvatar(this.avatar)
-      setAuthorization({token: loginRes.get('all_keys'), expireAt: new Date(today.setHours(today.getHours() + 24))})
+      setAuthorization({token: loginRes.get('public_key'), expireAt: new Date(today.setHours(today.getHours() + 240))})
       this.$router.push("/dashboard/wallet");
       this.$message.success(this.$t("welcome") + ' ' + loginRes.get('account_id'), 5);
     }

@@ -49,7 +49,6 @@
             />
           </a>
         </a-tooltip>
-        <header-notice class="header-item" />
         <header-avatar class="header-item" />
       </div>
     </div>
@@ -68,10 +67,6 @@ export default {
   data() {
     return {
       searchActive: false,
-      langList: [
-        { key: "ES", name: "Español Latinoaméricano", alias: "Español" },
-        { key: "US", name: "English", alias: "English" }
-      ]
     };
   },
   computed: {
@@ -82,7 +77,6 @@ export default {
       "systemName",
       "lang",
       "pageWidth",
-      "setLang",
     ]),
     headerTheme() {
       if (

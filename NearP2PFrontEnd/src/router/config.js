@@ -1,5 +1,5 @@
 import TabsView from '@/layouts/tabs/TabsView'
-import PageView from '@/layouts/PageView'
+import BlankView from '@/layouts/BlankView'
 
 // Route configuration
 const options = {
@@ -25,6 +25,31 @@ const options = {
       name: '403',
       component: () => import('@/pages/exception/403'),
     },
+    /*Trade Detail*/
+    {
+      path: '/d',
+      component: TabsView,
+      children: [
+        {
+          path: 'dashboard',
+          name: 'dashboard',
+          component: BlankView,
+        },
+        {
+          path: 'trade',
+          name: 'trade',
+          component: BlankView,
+          children: [
+            {
+              path: 'detail',
+              name: 'detail',
+              component: () => import('@/pages/detail/AdvancedDetail'),
+            },
+          ]
+        },
+      ]
+    },
+    /*General Menu*/
     {
       path: '/',
       name: 'Home',
@@ -32,72 +57,64 @@ const options = {
       redirect: '/login',
       children: [
         {
-          path: '/dashboard/wallet',
-          name: 'Wallet',
+          path: 'dashboard',
+          name: 'dashboard',
           meta: {
-            icon: 'wallet'
+            icon: 'dashboard'
           },
-          component: () => import('@/pages/dashboard/wallet'),
-        },
-        {
-          path: '/dashboard/p2p',
-          name: 'p2p',
-          meta: {
-            icon: 'usergroup-add'
-          },
-          component: () => import('@/pages/form/p2p'),
-        },
-        {
-          path: 'form',
-          meta: {
-            invisible: true,
-          },
-          component: PageView,
+          component: BlankView,
           children: [
             {
-              path: '/dashboard/send',
-              name: '基础表单',
-              component: () => import('@/pages/form/send'),
+              path: 'wallet',
+              name: 'wallet',            
+              meta: {
+                icon: 'wallet',
+                page: {
+                  closable: false
+                }
+              },
+              component: () => import('@/pages/dashboard/wallet'),
             },
+            {
+              path: 'analysis',
+              name: 'Analyze the page',
+              meta: {
+                icon: 'dashboard',
+              },
+              component: () => import('@/pages/dashboard/analysis'),
+            }
           ]
         },
         {
-          path: '/dashboard/account',
-          name: 'account',
+          path: 'trade',
+          name: 'trade',
           meta: {
-            icon: 'user'
-          },
-          component: () => import('@/pages/form/account'),
-        },
-        {
-          path: 'Settings',
-          name: 'Settings',
-          meta: {
-            icon: 'setting',
+            icon: 'usergroup-add',
             page: {
               cacheAble: false
             }
           },
-          component: PageView,
+          component: BlankView,
           children: [
             {
-              path: 'basic',
-              name: '基础表单',
-              component: () => import('@/pages/form/basic'),
+              path: 'p2p',
+              name: 'p2p',
+              meta: {
+                icon: 'usergroup-add',
+              },
+              component: () => import('@/pages/form/p2p'),
             },
             {
-              path: 'step',
-              name: '分步表单',
-              component: () => import('@/pages/form/step'),
+              path: 'offer',
+              name: 'offer',
+              meta: {
+                icon: 'user-add',
+              },
+              component: () => import('@/pages/form/account'),
             },
-            {
-              path: 'advance',
-              name: '高级表单',
-              component: () => import('@/pages/form/advance'),
-            }
           ]
         },
-      ],
+      ]
     },
   ]
 }

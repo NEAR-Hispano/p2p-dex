@@ -26,8 +26,9 @@ export default {
       margin-bottom: 4px;
     }
     p{
-      color: @text-color;
+      color: black;
       font-size: 24px;
+      font-weight: bold;
       margin: 0;
     }
   }

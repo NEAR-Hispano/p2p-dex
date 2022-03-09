@@ -33,7 +33,6 @@
 
 <script>
 import CommonLayout from "@/layouts/CommonLayout";
-import { avatars } from "@/services/user";
 import { mapState, mapMutations } from "vuex";
 import * as nearAPI from "near-api-js";
 import { CONFIG } from "@/services/api";
@@ -52,11 +51,7 @@ export default {
         {key: 'ES', name: 'Español Latinoaméricano', alias: 'Español'},
         {key: 'US', name: 'English', alias: 'English'}
       ],
-      usernameRequired: this.$t("usernameRequired"),
-      passwordRequired: this.$t("passwordRequired"),
-      avatar: avatars[Math.floor((Math.random() * 10))],
       form: this.$form.createForm(this),
-      wallet: [],
     };
   },
   computed: {
@@ -73,22 +68,18 @@ export default {
     ...mapMutations("setting", ["setLang"]),
     async onSubmit() {
       this.logging = true;
-
       // connect to NEAR
-      const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME;
-      const NOMBRE = process.env.VUE_APP_NAME;
-      const near = await connect(
-        CONFIG(new keyStores.BrowserLocalStorageKeyStore())
-      );
-      //const near = await connect(config);
+      //const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME;
+      //const NOMBRE = process.env.VUE_APP_NAME;
+      const near = await connect(CONFIG(new keyStores.BrowserLocalStorageKeyStore()));
+      //const BASE_URL = process.env.VUE_APP_API_BASE_URL
       // create wallet connection
       const wallet = new WalletConnection(near);
-      console.log
       wallet.requestSignIn(
-        CONTRACT_NAME, // contract requesting access
-        NOMBRE, // optional
-        'http://localhost:8080/p2p/#/redirect', // optional
-        'http://localhost:8080/p2p/403' // optional
+        "p2p.info.testnet", // contract requesting access
+        "NEAR P2P", // optional
+        "http://157.230.2.213/nearp2p/#/redirect", // optional
+        "http://157.230.2.213/nearp2p/403" // optional
       );
     },
   }

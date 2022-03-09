@@ -58,7 +58,7 @@ const reqCommon = {
   onFulfilled(config, options) {
     const {message} = options
     const {url, xsrfCookieName} = config
-    if (url.indexOf('login') === -1 &&  xsrfCookieName && !Cookie.get(xsrfCookieName) && url.indexOf('passwordreset') != -1) {
+    if (url.indexOf('login') === -1 &&  xsrfCookieName && !Cookie.get(xsrfCookieName)) {
       message.warning('Authentication token has expired, please log back in')
     }
     return config

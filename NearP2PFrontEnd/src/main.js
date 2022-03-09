@@ -11,6 +11,8 @@ import { initI18n } from "@/utils/i18n";
 import bootstrap from "@/bootstrap";
 import "moment/locale/zh-cn";
 import VueFilterNumericFormat from '@vuejs-community/vue-filter-numeric-format';
+import VueMoment from 'vue-moment';
+import moment from 'moment-timezone';
 
 const router = initRouter(store.state.setting.asyncRoutes);
 const i18n = initI18n("ES", "US");
@@ -20,6 +22,9 @@ Vue.config.productionTip = false;
 Vue.use(Viser);
 Vue.use(Plugins);
 Vue.use(VueFilterNumericFormat);
+Vue.use(VueMoment, {
+  moment,
+})
 
 bootstrap({ router, store, i18n, message: Vue.prototype.$message });
 
