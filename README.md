@@ -49,7 +49,10 @@ A design was made to log into the application, validating that the user has a Ne
 
 >Login
 
-![Connect with Near](https://user-images.githubusercontent.com/96194326/147897597-59a943e4-34ff-4496-a222-006334ccaed9.jpeg)
+![Connect with Near] (https://user-images.githubusercontent.com/96194326/147897597-59a943e4-34ff-4496-a222-006334ccaed9.jpeg)
+
+![Connect with NEAR] (https://user-images.githubusercontent.com/9405072/157554226-2be6acf7-4dfb-4d57-929b-47570788924a.png)
+
 
 >Connect with NEAR
 
