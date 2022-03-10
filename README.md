@@ -71,13 +71,16 @@ In this screen it is possible to indicate if it is going to be imported to a dif
 >List of purchase and sale of cryptocurrencies
 
 ![Terms and conditions - Sell](https://user-images.githubusercontent.com/9405072/157559250-611bd816-974d-48e5-a16b-51dab6c594b9.png)
+>Sale order
 
 ![Analisys Dashboard](https://user-images.githubusercontent.com/9405072/157559256-c9376106-21f3-414d-8f86-43a820402ffd.png)
-
+>User movement 
 
 ![Dashboard" src](https://user-images.githubusercontent.com/9405072/157559269-46513b0c-4d5f-46c9-b37d-dd40fcc22c65.png)
+>Dashboard
 
 ![Account data](https://user-images.githubusercontent.com/9405072/157559296-ee28037e-40f5-479a-ba25-299d5d690f56.png)
+>Account data
 
 
 We are working on a design that adapts to all device sizes to see the availability in the Near wallet and then make the sale or purchase of NEAR or USDT from the application.
