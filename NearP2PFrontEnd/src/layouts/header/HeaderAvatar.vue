@@ -9,10 +9,6 @@
         <a-icon style="margin-right: 8px;" type="poweroff" />
         <span>{{ $t('logout') }}</span>
       </a-menu-item>
-      <a-menu-item @click="account">
-        <a-icon style="margin-right: 8px;" type="user" />
-        <span>{{ $t('account') }}</span>
-      </a-menu-item>
     </a-menu>
   </a-dropdown>
 </template>
@@ -44,9 +40,6 @@ export default {
       wallet.signOut();
       this.$router.push("/login");
     },
-    account() {
-      this.$router.push('/trade/account')
-    }
   }
 };
 </script>

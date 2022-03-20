@@ -20,50 +20,109 @@
           <a-row type="flex">
             <a-col :xxl="4" :xl="4" :lg="4" />
             <a-col :xxl="8" :xl="8" :lg="8" :md="24" :sm="24" :xs="24">
-              <a-form-item :label="$t('name')" style="margin-top:5px">
-                <a-input
+              <a-form-item :label="$t('description')" style="margin-top:5px">
+                <a-select
+                  show-search
+                  :placeholder="allpayments"
+                  option-filter-prop="children"
+                  style="width: 90%;margin-top: 5px"
                   v-decorator="[
-                    'name',
-                    {
-                      rules: [{ required: true, message: $t('requiredfield') }]
-                    }
-                  ]"
-                  :placeholder="$t('name')"
-                  style="width: 90%"
-                />
+                      'payment_method_id',
+                      {
+                        rules: [
+                          { required: true, message: $t('requiredfield') }
+                        ]
+                      }
+                    ]"
+                >
+                  <a-select-option
+                    v-for="i in listPayments"
+                    :key="i.id"
+                    :value="i.id"
+                  >
+                    {{ i.payment_method }}
+                  </a-select-option>
+                </a-select>
               </a-form-item>
             </a-col>
             <a-col :xxl="8" :xl="8" :lg="8" :md="24" :sm="24" :xs="24">
-              <a-form-item :label="$t('lastname')" style="margin-top:5px">
+              <a-form-item :label="$t('info1')" style="margin-top:5px">
                 <a-input
                   v-decorator="[
-                    'last_name',
+                    'input1',
                     {
                       rules: [{ required: true, message: $t('requiredfield') }]
                     }
                   ]"
-                  :placeholder="$t('lastname')"
+                  :placeholder="$t('info1')"
                   style="width: 90%"
                 />
               </a-form-item>
-              <a @click="showDrawer" style="padding-top:15px">{{ $t("profile") }}</a>
             </a-col>
           </a-row>
           <a-row type="flex">
             <a-col :xxl="4" :xl="4" :lg="4" />
             <a-col :xxl="8" :xl="8" :lg="8" :md="24" :sm="24" :xs="24">
-              <a-form-item :label="$t('email')" style="margin-top:5px">
+              <a-form-item :label="$t('info2')" style="margin-top:5px">
                 <a-input
                   v-decorator="[
-                    'email',
+                    'input2',
                     {
-                      rules: [{ required: true, type: 'email', message: $t('invalidmail') }]
+                      rules: [{ required: true, message: $t('requiredfield') }]
                     }
                   ]"
-                  :placeholder="$t('email')"
+                  :placeholder="$t('input2')"
                   style="width: 90%"
                 />
               </a-form-item>
+            </a-col>
+            <a-col :xxl="8" :xl="8" :lg="8" :md="24" :sm="24" :xs="24">
+              <a-form-item :label="$t('info3')" style="margin-top:5px">
+                <a-input
+                  v-decorator="[
+                    'input3',
+                    {
+                      rules: [{ required: true, message: $t('requiredfield') }]
+                    }
+                  ]"
+                  :placeholder="$t('info3')"
+                  style="width: 90%"
+                />
+              </a-form-item>
+            </a-col>
+          </a-row>
+          <a-row type="flex">
+            <a-col :xxl="4" :xl="4" :lg="4" />
+            <a-col :xxl="8" :xl="8" :lg="8" :md="24" :sm="24" :xs="24">
+              <a-form-item :label="$t('info4')" style="margin-top:5px">
+                <a-input
+                  v-decorator="[
+                    'input4',
+                    {
+                      rules: [{ required: true, message: $t('requiredfield') }]
+                    }
+                  ]"
+                  :placeholder="$t('info4')"
+                  style="width: 90%"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :xxl="8" :xl="8" :lg="8" :md="24" :sm="24" :xs="24">
+              <a-form-item :label="$t('info5')" style="margin-top:5px">
+                <a-input
+                  v-decorator="[
+                    'input5',
+                    {
+                      rules: [{ required: true, message: $t('requiredfield') }]
+                    }
+                  ]"
+                  :placeholder="$t('info5')"
+                  style="width: 90%"
+                />
+              </a-form-item>
+              <a @click="showDrawer" style="padding-top:15px">{{
+                $t("profile")
+              }}</a>
             </a-col>
           </a-row>
           <a-row type="flex">
@@ -96,6 +155,7 @@ import { mapGetters } from "vuex";
 import UserInfo from "./UserInfo";
 const { connect, keyStores, WalletConnection, Contract } = nearAPI;
 
+
 export default {
   name: "Account",
   components: {
@@ -117,8 +177,10 @@ export default {
       active_orders: "0",
       orderssell: [],
       ordersbuy: [],
+      listPayments: [],
+      allpayments: this.$t("allpayments"),
       url: "",
-      message : "",
+      message: ""
     };
   },
   mounted() {
@@ -128,9 +190,16 @@ export default {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
 
-    if (urlParams.get('transactionHashes') !== null) {
-      this.success(process.env.VUE_APP_API_BASE_URL_EXPLORER + urlParams.get('transactionHashes'));
-      window.history.pushState({}, document.title, "/nearp2p/#/account/myaccount");
+    if (urlParams.get("transactionHashes") !== null) {
+      this.success(
+        process.env.VUE_APP_API_BASE_URL_EXPLORER +
+          urlParams.get("transactionHashes")
+      );
+      window.history.pushState(
+        {},
+        document.title,
+        "/nearp2p/#/account/myaccount"
+      );
     }
   },
   methods: {
@@ -146,7 +215,7 @@ export default {
       const wallet = new WalletConnection(near);
       // console.log(near);
       const contract = new Contract(wallet.account(), CONTRACT_NAME, {
-        viewMethods: ["get_order_sell", "get_order_buy"],
+        viewMethods: ["get_order_sell", "get_order_buy", "get_payment_method"],
         changeMethods: ["set_payment_method"],
         sender: wallet.account()
       });
@@ -157,6 +226,7 @@ export default {
         this.ordersbuy = await contract.get_order_buy({
           user_id: this.userInfo
         });
+        this.listPayments = await contract.get_payment_method();
         this.active_orders =
           parseInt(this.orderssell.length) + parseInt(this.ordersbuy.length);
       }
@@ -165,13 +235,15 @@ export default {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
-          //console.log("Received values of form: ", values.name);
-          this.setUser(values.name, values.last_name, values.email);
+          //console.log("Received values of form: ", values);
+          this.set_payment_method_user(values.payment_method_id, values.input1, values.input2, values.input3, values.input4, values.input5);
         }
       });
     },
-    async setUser(name, last_name, email) {
+    async set_payment_method_user(payment_method_id, input1, input2, input3, input4, input5) {
       this.$message.success(this.$t("pc"));
+      const CryptoJS = require("crypto-js")
+      const passphrase = 'Andromeda2018#';
       //this.loading = true;
       // connect to NEAR
       const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME;
@@ -183,38 +255,23 @@ export default {
       const wallet = new WalletConnection(near);
       // console.log(near);
       const contract = new Contract(wallet.account(), CONTRACT_NAME, {
-        changeMethods: ["set_user", "put_user"],
+        changeMethods: ["set_payment_method_user"],
         sender: wallet.account()
       });
       if (wallet.isSignedIn()) {     
-        if(localStorage.getItem("userlength") == 0){
-          localStorage.setItem("userlength", "1");
-          await contract.set_user({
+          await contract.set_payment_method_user({
             user_id: this.userInfo,
-            name: name,
-            last_name: last_name,
-            phone: "000",
-            email: email,
-            country: "N/A"
+            payment_method_id: payment_method_id,
+            input1: CryptoJS.AES.encrypt(input1, passphrase).toString(),
+            input2: CryptoJS.AES.encrypt(input2, passphrase).toString(),
+            input3: CryptoJS.AES.encrypt(input3, passphrase).toString(),
+            input4: CryptoJS.AES.encrypt(input4, passphrase).toString(),
+            input5: CryptoJS.AES.encrypt(input5, passphrase).toString(),
           },
           "300000000000000", // attached GAS (optional)
           "1" // attached deposit in yoctoNEAR (optional)
           );} 
-        else {  
-        await contract.put_user(
-          {
-            name: name,
-            last_name: last_name,
-            phone: "000",
-            email: email,
-            country: "N/A"
-          },
-          "300000000000000", // attached GAS (optional)
-          "1" // attached deposit in yoctoNEAR (optional)
-        );
-        }
-      }
-    },
+      },
     showDrawer() {
       this.$refs.userinfo.showDrawer();
     },
@@ -224,7 +281,7 @@ export default {
       this.message = this.$t("explorer");
       //var dir = process.env.NEAR_EXPLORER + url
       this.$success({
-        title: 'LOG',
+        title: "LOG",
         // JSX support
         content: (
           <div>
@@ -234,10 +291,9 @@ export default {
               </a>
             </p>
           </div>
-        ),
+        )
       });
-    },
-
+    }
   }
 };
 </script>

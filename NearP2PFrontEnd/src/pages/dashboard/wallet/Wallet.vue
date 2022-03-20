@@ -6,7 +6,7 @@
       </div>
     </div>
     <template slot="extra">
-      <head-info class="split-right" style="color:red" :title="$t('project')" content="1" />
+      <head-info-orders class="split-right" :title="$t('project')" :content="active_orders" />
       <head-info class="split-right" :title="$t('ranking')" content="90%" />
     </template>
     <template>
@@ -103,6 +103,7 @@
 import { mapGetters } from "vuex";
 import PageLayout from "@/layouts/PageLayout";
 import HeadInfo from "@/components/tool/HeadInfo";
+import HeadInfoOrders from "@/components/tool/HeadInfoOrders";
 import * as nearAPI from "near-api-js";
 import { BINANCE_NEAR } from "@/services/api";
 import { CONFIG } from "@/services/api";
@@ -111,11 +112,14 @@ const NOMBRE = process.env.VUE_APP_NAME;
 
 export default {
   name: "Wallet",
-  components: { HeadInfo, PageLayout },
+  components: { HeadInfo, PageLayout, HeadInfoOrders },
   i18n: require("./i18n"),
   data() {
     return {
       data: [],
+      orderssell: [],
+      ordersbuy: [],
+      active_orders: "0",
       tether: [],
       lastPrice: [],
       projects: [],
@@ -171,16 +175,16 @@ export default {
     this.welcome.message = message[Math.floor(Math.random() * message.length)];
     this.fetch();
     setTimeout(this.fetch(), 1000);
-    setTimeout(this.fetch(), 1000);
+    //setTimeout(this.fetch(), 1000);
     this.getBalance();
     this.getBalanceTether();
 
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
+    //const queryString = window.location.search;
+    //const urlParams = new URLSearchParams(queryString);
 
-    if (urlParams.get('account_id') !== null) {
-      this.$router.push({ path: '/dashboard/wallet', replace: true })
-    }
+    //if (urlParams.get('account_id') !== null) {
+      //window.history.pushState({}, document.title, "/nearp2p/#/dashboard/wallet");
+    //}
   },
   methods: {
     fetch() {
@@ -196,6 +200,15 @@ export default {
       //console.log(new keyStores.BrowserLocalStorageKeyStore())
       const near = await connect(CONFIG(new keyStores.BrowserLocalStorageKeyStore()));
       const wallet = new WalletConnection(near);
+
+      const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME;
+
+      const contract = new Contract(wallet.account(), CONTRACT_NAME, {
+        viewMethods: ["get_order_sell", "get_order_buy", "get_user"],
+        changeMethods: [],
+        sender: wallet.account()
+      });
+      var user = [];
       //console.log(wallet.account());
       if (wallet.isSignedIn()) {
         const accountId = wallet.getAccountId();
@@ -210,6 +223,19 @@ export default {
         localStorage.setItem("wallet_balance", this.balance); 
         this.balanceDollar = this.balance * this.lastPrice.lastPrice;
         this.balanceblock = (0.25 * this.lastPrice.lastPrice).toFixed(2);
+
+        this.orderssell = await contract.get_order_sell({
+            user_id: this.userInfo,
+        });
+        this.ordersbuy = await contract.get_order_buy({
+            user_id: this.userInfo,
+        });
+
+        user = await contract.get_user({
+            user_id: this.userInfo,
+        });
+        localStorage.setItem("userlength", user.length);
+        this.active_orders = parseInt(this.orderssell.length) + parseInt(this.ordersbuy.length);
       }
     },
     async getBalanceTether() {

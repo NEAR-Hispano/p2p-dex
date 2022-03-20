@@ -82,7 +82,7 @@
 
     <!--- Drawer --->
     <a-drawer
-      width="650"
+      width="auto"
       placement="right"
       :closable="false"
       :visible="visible"

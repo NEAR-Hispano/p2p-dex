@@ -78,8 +78,8 @@ export default {
       wallet.requestSignIn(
         "p2p.info.testnet", // contract requesting access
         "NEAR P2P", // optional
-        "http://157.230.2.213/nearp2p/#/redirect", // optional
-        "http://157.230.2.213/nearp2p/403" // optional
+        "http://localhost:8080/nearp2p/#/redirect", // optional
+        "http://localhost:8080/nearp2p/403" // optional
       );
     },
   }

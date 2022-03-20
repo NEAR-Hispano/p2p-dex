@@ -12,9 +12,16 @@ module.exports = {
       trade: {
         name: "Trade",
         p2p: { name: "P2P" },
+        p2pdetail: { name: "Detalle de ordenes" },
         offer: { name: "Ofertar" },
-        account: { name: "Cuenta" },
-      }
+        merchant: { name: "Administradr para mercantes" },
+      },
+      account: {
+        name: "Cuenta",
+        myaccount: { name: "Mi cuenta" },
+        bank: { name: "Métodos de pago" },
+        history: { name: "Histórico de transacciones" },
+      },
     },
     US: {
       home: {
@@ -23,14 +30,22 @@ module.exports = {
       dashboard: {
         name: "Dashboard",
         wallet: { name: "Wallet" },
-        analysis: { name: "Analisys" }
+        analysis: { name: "Analisys" },
+        merchant: { name: "Admin Mercantes" },
       },
       trade: {
         name: "Trade",
         p2p: { name: "P2P" },
+        p2pdetail: { name: "Order details" },
         offer: { name: "Place an offer" },
-        account: { name: "Account" },
-      }
+        merchant: { name: "Admin place for Merchants" },
+      },
+      account: {
+        name: "Account",
+        myaccount: { name: "My account" },
+        bank: { name: "Payment methods" },
+        history: { name: "Transacction history" },
+      },
     }
   }
 };

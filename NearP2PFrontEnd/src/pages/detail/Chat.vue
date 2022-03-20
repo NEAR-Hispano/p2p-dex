@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <header>
-      <h1 style="color: white">Chat NEAR DEX!!!</h1>
+      <h1 style="color: white">Chat</h1>
       <div v-if="imageData != null">
         <img class="img.preview" :src="picture" />
         <br />
@@ -33,7 +33,7 @@
           autofocus
           ref="input"
           type="text"
-          placeholder="Enter your message!"
+          :placeholder="tmessage"
         />
 
         <div
@@ -73,26 +73,32 @@
 import firebase from "firebase/compat/app";
 import { db } from "./fire";
 import { getAuth, signInAnonymously } from "firebase/auth";
+import { mapGetters } from "vuex";
 
 export default {
   name: "Chat",
+  i18n: require("./i18n"),
   data() {
     return {
       user: firebase.auth().currentUser,
       db: firebase.firestore(),
       message: "",
+      tmessage: this.$t("enter_message"),
       messages: [],
       photos: [],
       photo: null,
       //fileURL: null,
       isloading: false,
       uploadValue: 0,
-      imageData: null
+      imageData: null,
+      room : 'room' + this.$route.query.order
       //picture: 'url',
     };
   },
   async beforeMount() {
-    const room1Ref = db.collection("room1");
+    // console.log(this.room)
+    // console.log(this.userInfo)
+    const room1Ref = db.collection(this.room);
     const snapshot = await room1Ref.where("displayName", "==", "NEAR").get();
     if (!snapshot.empty) {
       this.login();
@@ -101,7 +107,7 @@ export default {
   },
   async mounted() {
     // RUTINA PARA CREAR LA SALA DE CHAT
-    const room1Ref = db.collection("room1");
+    const room1Ref = db.collection(this.room);
     const snapshot = await room1Ref.where("displayName", "==", "NEAR").get();
     if (snapshot.empty) {
       this.login();
@@ -111,11 +117,11 @@ export default {
         userUID: this.user.uid,
         displayName: "NEAR",
         text:
-          "ATENCION! NO libere las criptomonedas antes de confirmar si el dinero llegó a su cuenta de pago (balance disponible).",
+         this.$t("chat_text"),
         created: 0
       };
-      db.collection("room1").add(messageInfo);
-      db.collection("room1")
+      db.collection(this.room).add(messageInfo);
+      db.collection(this.room)
         .orderBy("created")
         .onSnapshot(querySnap => {
           this.messages = querySnap.docs.map(doc => doc.data());
@@ -123,7 +129,7 @@ export default {
       this.$refs["scrollable"].scrollIntoView({ behavior: "smooth" });
       return;
     }
-    db.collection("room1")
+    db.collection(this.room)
       .orderBy("created")
       .onSnapshot(querySnap => {
         this.messages = querySnap.docs.map(doc => doc.data());
@@ -136,6 +142,7 @@ export default {
     messagePhoto() {
       return URL.createObjectURL(this.photo);
     },
+    ...mapGetters("account", ["userInfo"])
   },
 
   methods: {
@@ -146,7 +153,7 @@ export default {
 
     async Confirmar() {
       const query = await db
-        .collection("room1")
+        .collection(this.room)
         .where("created", ">", 0)
         .orderBy("created")
         .get();
@@ -177,13 +184,12 @@ export default {
       } else {
         const messageInfo = {
           userUID: this.user.uid,
-          displayName: "gperez83.near",
           photoURL: null,
           text: this.message,
           created: Date.now(),
-          room: "room1"
+          room: this.room
         };
-        await this.db.collection("room1").add(messageInfo);
+        await this.db.collection(this.room).add(messageInfo);
         this.message = "";
         this.$refs["scrollable"].scrollIntoView({ behavior: "smooth" });
       }
@@ -191,13 +197,12 @@ export default {
     async Grabar() {
       const messageInfo = {
         userUID: this.user.uid,
-        displayName: "gperez83.near",
         photoURL: this.picture,
         text: this.message,
         created: Date.now(),
-        room: "room1"
+        room: this.room
       };
-      await db.collection("room1").add(messageInfo);
+      await db.collection(this.room).add(messageInfo);
       this.message = "";
       this.photo = null;
       this.$refs["scrollable"].scrollIntoView({ behavior: "smooth" });

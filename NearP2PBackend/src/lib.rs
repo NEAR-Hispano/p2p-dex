@@ -299,15 +299,19 @@ impl NearP2P {
     /// Params: user_id: String, name: String
     /// last_name: String, phone: String, email: String, country: String
     #[payable]
-    pub fn set_user(&mut self, user_id: AccountId,
+    pub fn set_user(&mut self,
         name: String,
         last_name: String,
         phone: String,
         email: String,
         country: String) -> String {
         assert_one_yocto();
+        let user = self.users.iter().find(|x| x.user_id == env::signer_account_id());
+        if user.is_none() {
+            env::panic(b"profile already exists");
+        }
         let data = UserObject {
-            user_id: user_id.to_string(),
+            user_id: env::signer_account_id().to_string(),
             name: name.to_string(),
             last_name: last_name.to_string(),
             phone: phone.to_string(),
@@ -319,7 +323,7 @@ impl NearP2P {
         };
         self.users.push(data);
         let data2 = MerchantObject {
-            user_id: user_id.to_string(),
+            user_id: env::signer_account_id().to_string(),
             total_orders: 0,
             orders_completed: 0,
             percentaje_completion: 0.0,
@@ -329,7 +333,7 @@ impl NearP2P {
         self.merchant.push(data2);
        // set_merchant(user_id: user_id.to_string(), total_orders: 0, orders_completed: 0 , badge: "".to_string());
         env::log(b"User Created");
-        user_id.to_string()
+        env::signer_account_id().to_string().to_string()
     }
     
     /// Set the users object into the contract
@@ -392,9 +396,8 @@ impl NearP2P {
 
     /// Returns the order object loaded in contract
     /// Params: campo: String, valor: String
-    pub fn get_offers_sell(self, amount: Option<Balance>, fiat_method: Option<i128>, payment_method: Option<i128>, is_merchant: Option<bool>) -> Vec<OfferObject> {
-        search_offer(self.offers_sell, amount, fiat_method, payment_method, is_merchant)
-        //search_offer(self.offers_sell, campo.to_string(), valor.to_string())
+    pub fn get_offers_sell(self, amount: Option<Balance>, fiat_method: Option<i128>, payment_method: Option<i128>, is_merchant: Option<bool>, owner_id: Option<AccountId>) -> Vec<OfferObject> {
+        search_offer(self.offers_sell, amount, fiat_method, payment_method, is_merchant, owner_id)
     }
 
 
@@ -485,9 +488,8 @@ impl NearP2P {
 
     /// Returns the order object loaded in contract
     /// Params: campo: String, valor: String
-    pub fn get_offers_buy(self, amount: Option<Balance>, fiat_method: Option<i128>, payment_method: Option<i128>, is_merchant: Option<bool>) -> Vec<OfferObject> {
-        search_offer(self.offers_buy, amount, fiat_method, payment_method, is_merchant)
-        //search_offer(self.offers_buy, campo.to_string(), valor.to_string())
+    pub fn get_offers_buy(self, amount: Option<Balance>, fiat_method: Option<i128>, payment_method: Option<i128>, is_merchant: Option<bool>, owner_id: Option<AccountId>) -> Vec<OfferObject> {
+        search_offer(self.offers_buy, amount, fiat_method, payment_method, is_merchant, owner_id)
     }
 
 
@@ -707,6 +709,7 @@ impl NearP2P {
         for i in 0..self.payment_method.len() {
             if self.payment_method.get(i).unwrap().id == id {
                 self.payment_method.remove(i);
+                break;
             }
         }
         for i in 0..self.payment_method_user.len() {
@@ -758,9 +761,11 @@ impl NearP2P {
     /// Delete the Fiat Method object into the contract
     /// Params: id: i128
     pub fn delete_fiat_method(&mut self, id: i128) {
+        self.users.iter().find(|x| x.user_id == env::signer_account_id().to_string() && x.admin == true).expect("User not admin");
         for i in 0..self.fiat_method.len() {
             if self.fiat_method.get(i).unwrap().id == id {
                 self.fiat_method.remove(i);
+                break;
             }
         }
         env::log(b"Fiat Method Delete");
@@ -768,34 +773,57 @@ impl NearP2P {
 
 
      /// Returns the users object loaded in contract
-     pub fn get_payment_method_user(self, user_id: AccountId) -> Vec<PaymentMethodUserObject> {
+     pub fn get_payment_method_user(self, user_id: AccountId, method_id: Option<i128>) -> Vec<PaymentMethodUserObject> {
         let mut result: Vec<PaymentMethodUserObject> = Vec::new();
-        for i in 0..self.payment_method_user.len() {
-            if self.payment_method_user[i].user_id == user_id.to_string() {
-                result.push(PaymentMethodUserObject {
-                    user_id: self.payment_method_user[i].user_id.to_string(),
-                    payment_method_id: self.payment_method_user[i].payment_method_id,
-                    payment_method: self.payment_method_user[i].payment_method.to_string(),
-                    desc1: self.payment_method_user[i].desc1.to_string(),
-                    input1: self.payment_method_user[i].input1.to_string(),
-                    desc2: self.payment_method_user[i].desc2.to_string(),
-                    input2: self.payment_method_user[i].input2.to_string(),
-                    desc3: self.payment_method_user[i].desc3.to_string(),
-                    input3: self.payment_method_user[i].input3.to_string(),
-                    desc4: self.payment_method_user[i].desc4.to_string(),
-                    input4: self.payment_method_user[i].input4.to_string(),
-                    desc5: self.payment_method_user[i].desc5.to_string(),
-                    input5: self.payment_method_user[i].input5.to_string(),
-                });
+        if self.payment_method_user.len() > 0 {
+            for i in 0..self.payment_method_user.len() {
+                if method_id.is_some() {
+                    if self.payment_method_user.get(i).unwrap().payment_method_id == method_id.unwrap() && self.payment_method_user.get(i).unwrap().user_id == user_id.to_string() {
+                        result.push(PaymentMethodUserObject {
+                            user_id: self.payment_method_user[i].user_id.to_string(),
+                            payment_method_id: self.payment_method_user[i].payment_method_id,
+                            payment_method: self.payment_method_user[i].payment_method.to_string(),
+                            desc1: self.payment_method_user[i].desc1.to_string(),
+                            input1: self.payment_method_user[i].input1.to_string(),
+                            desc2: self.payment_method_user[i].desc2.to_string(),
+                            input2: self.payment_method_user[i].input2.to_string(),
+                            desc3: self.payment_method_user[i].desc3.to_string(),
+                            input3: self.payment_method_user[i].input3.to_string(),
+                            desc4: self.payment_method_user[i].desc4.to_string(),
+                            input4: self.payment_method_user[i].input4.to_string(),
+                            desc5: self.payment_method_user[i].desc5.to_string(),
+                            input5: self.payment_method_user[i].input5.to_string(),
+                        });
+                    }
+                } else {
+                    if self.payment_method_user.get(i).unwrap().user_id == user_id.to_string() {
+                        result.push(PaymentMethodUserObject {
+                            user_id: self.payment_method_user[i].user_id.to_string(),
+                            payment_method_id: self.payment_method_user[i].payment_method_id,
+                            payment_method: self.payment_method_user[i].payment_method.to_string(),
+                            desc1: self.payment_method_user[i].desc1.to_string(),
+                            input1: self.payment_method_user[i].input1.to_string(),
+                            desc2: self.payment_method_user[i].desc2.to_string(),
+                            input2: self.payment_method_user[i].input2.to_string(),
+                            desc3: self.payment_method_user[i].desc3.to_string(),
+                            input3: self.payment_method_user[i].input3.to_string(),
+                            desc4: self.payment_method_user[i].desc4.to_string(),
+                            input4: self.payment_method_user[i].input4.to_string(),
+                            desc5: self.payment_method_user[i].desc5.to_string(),
+                            input5: self.payment_method_user[i].input5.to_string(),
+                        });
+                    }
+                }
             }
+            result
+        } else {
+            result
         }
-        result
     }
 
     //Set the Payment Method User object into the contract
     #[payable]
-    pub fn set_payment_method_user(&mut self, user_id: ValidAccountId
-        , payment_method_id: i128
+    pub fn set_payment_method_user(&mut self, payment_method_id: i128
         , input1: String
         , input2: String
         , input3: String
@@ -804,43 +832,38 @@ impl NearP2P {
         assert_one_yocto();
         let mut duplicate: bool = false;
         for i in 0..self.payment_method_user.len() {
-            if self.payment_method_user.get(i).unwrap().payment_method_id == payment_method_id && self.payment_method_user.get(i).unwrap().user_id == user_id.to_string() {
-                duplicate = true;
+            if self.payment_method_user.get(i).unwrap().payment_method_id == payment_method_id && self.payment_method_user.get(i).unwrap().user_id == env::signer_account_id().to_string() {
+                env::panic(b"Repeated payment methods are not allowed");
             }
         }
-        if duplicate == false {
-            for i in 0..self.payment_method.len() {
-                if self.payment_method[i].id == payment_method_id {
-                    let data = PaymentMethodUserObject {
-                        user_id: user_id.to_string(),
-                        payment_method_id: payment_method_id,
-                        payment_method: self.payment_method[i].payment_method.to_string(),
-                        desc1: self.payment_method[i].input1.to_string(),
-                        input1: input1,
-                        desc2: self.payment_method[i].input2.to_string(),
-                        input2: input2,
-                        desc3: self.payment_method[i].input3.to_string(),
-                        input3: input3,
-                        desc4: self.payment_method[i].input4.to_string(),
-                        input4: input4,
-                        desc5: self.payment_method[i].input5.to_string(),
-                        input5: input5,
-                    };
-                    self.payment_method_user.push(data);
-                    env::log(b"Payment Method User Created");
-                    return "".to_string();
-                }
+        for i in 0..self.payment_method.len() {
+            if self.payment_method[i].id == payment_method_id {
+                let data = PaymentMethodUserObject {
+                    user_id: env::signer_account_id().to_string(),
+                    payment_method_id: payment_method_id,
+                    payment_method: self.payment_method[i].payment_method.to_string(),
+                    desc1: self.payment_method[i].input1.to_string(),
+                    input1: input1,
+                    desc2: self.payment_method[i].input2.to_string(),
+                    input2: input2,
+                    desc3: self.payment_method[i].input3.to_string(),
+                    input3: input3,
+                    desc4: self.payment_method[i].input4.to_string(),
+                    input4: input4,
+                    desc5: self.payment_method[i].input5.to_string(),
+                    input5: input5,
+                };
+                self.payment_method_user.push(data);
+                env::log(b"Payment Method User Created");
+                return "".to_string();
             }
-            env::panic(b"the payment method provided does not exist");
-        } else {
-            env::panic(b"Repeated payment methods are not allowed");
         }
+        env::panic(b"the payment method provided does not exist");
     }
 
     /// put the Payment Method object into the contract
     #[payable]
-    pub fn put_payment_method_user(&mut self, user_id: AccountId
-        , payment_method_id: i128
+    pub fn put_payment_method_user(&mut self, payment_method_id: i128
         , input1: String
         , input2: String
         , input3: String
@@ -848,7 +871,7 @@ impl NearP2P {
         , input5: String) {
         assert_one_yocto();
         for i in 0..self.payment_method_user.len() {
-            if self.payment_method_user.get(i).unwrap().payment_method_id == payment_method_id && self.payment_method_user.get(i).unwrap().user_id == user_id.to_string() {
+            if self.payment_method_user.get(i).unwrap().payment_method_id == payment_method_id && self.payment_method_user.get(i).unwrap().user_id == env::signer_account_id().to_string() {
                 self.payment_method_user[i].input1 = input1.to_string();
                 self.payment_method_user[i].input2 = input2.to_string();
                 self.payment_method_user[i].input3 = input3.to_string();
@@ -862,14 +885,23 @@ impl NearP2P {
 
     /// delete the Payment Method user object into the contract
     #[payable]
-    pub fn delete_payment_method_user(&mut self, user_id: AccountId
-        , payment_method_id: i128) {
+    pub fn delete_payment_method_user(&mut self, payment_method_id: i128) {
         assert_one_yocto();
         for i in 0..self.payment_method_user.len() {
-            if self.payment_method_user.get(i).unwrap().payment_method_id == payment_method_id && self.payment_method_user.get(i).unwrap().user_id == user_id.to_string() {
-                self.payment_method_user.remove(i);
+            if self.payment_method_user.get(i).unwrap().payment_method_id == payment_method_id {
+                if self.payment_method_user.get(i).unwrap().user_id == env::signer_account_id().to_string() {
+                    self.payment_method_user.remove(i);
+                    break;
+                } else {
+                    env::panic(b"the payment method does not correspond to your user");
+                }
             }
         }
+        /*for i in 0..self.payment_method_user.len() {
+            if self.payment_method_user.get(i).unwrap().payment_method_id == payment_method_id && self.payment_method_user.get(i).unwrap().user_id == env::signer_account_id().to_string() {
+                self.payment_method_user.remove(i);
+            }
+        }*/
         env::log(b"Payment Method User Delete");
     }
 
@@ -979,12 +1011,35 @@ impl NearP2P {
         }
     }
 
-    pub fn get_order_sell(self, order_id: Option<i128>, user_id: Option<AccountId>) -> Vec<OrderObject> {
+    pub fn get_order_sell(self, order_id: Option<i128>, owner_id: Option<AccountId>, signer_id:Option<AccountId>) -> Vec<OrderObject> {
         let mut result: Vec<OrderObject> = Vec::new();
-        if user_id.is_some() {
-            let user = user_id.unwrap().clone();
+        if owner_id.is_some() {
+            let user = owner_id.unwrap().clone();
             for i in 0..self.orders_sell.len() {
-                if self.orders_sell[i].owner_id == user.to_string() || self.orders_sell[i].signer_id == user.to_string() {
+                if self.orders_sell[i].owner_id == user.to_string() {
+                    result.push(OrderObject {
+                        offer_id: self.orders_sell[i].offer_id,
+                        order_id: self.orders_sell[i].order_id,
+                        owner_id: self.orders_sell[i].owner_id.to_string(),
+                        signer_id: self.orders_sell[i].signer_id.to_string(),
+                        exchange_rate: self.orders_sell[i].exchange_rate.to_string(),
+                        operation_amount: self.orders_sell[i].operation_amount,
+                        payment_method: self.orders_sell[i].payment_method,
+                        fiat_method: self.orders_sell[i].fiat_method,
+                        confirmation_owner_id: self.orders_sell[i].confirmation_owner_id,
+                        confirmation_signer_id: self.orders_sell[i].confirmation_signer_id,
+                        confirmation_current: self.orders_sell[i].confirmation_current,
+                        time: self.orders_sell[i].time,
+                        datetime: self.orders_sell[i].datetime.to_string(),
+                        terms_conditions: self.orders_sell[i].terms_conditions.to_string(),
+                        status: self.orders_sell[i].status,
+                    });
+                };
+            };
+        } else if signer_id.is_some() {
+            let user = signer_id.unwrap().clone();
+            for i in 0..self.orders_sell.len() {
+                if self.orders_sell[i].signer_id == user.to_string() {
                     result.push(OrderObject {
                         offer_id: self.orders_sell[i].offer_id,
                         order_id: self.orders_sell[i].order_id,
@@ -1032,12 +1087,35 @@ impl NearP2P {
         result
     }
 
-    pub fn get_order_buy(self, order_id: Option<i128>, user_id: Option<AccountId>) -> Vec<OrderObject> {
+    pub fn get_order_buy(self, order_id: Option<i128>, owner_id: Option<AccountId>, signer_id: Option<AccountId>) -> Vec<OrderObject> {
         let mut result: Vec<OrderObject> = Vec::new();
-        if user_id.is_some() {
-            let user = user_id.unwrap().clone();
+        if owner_id.is_some() {
+            let user = owner_id.unwrap().clone();
             for i in 0..self.orders_buy.len() {
-                if self.orders_buy[i].owner_id == user.to_string() || self.orders_buy[i].signer_id == user.to_string() {
+                if self.orders_buy[i].owner_id == user.to_string() {
+                    result.push(OrderObject {
+                        offer_id: self.orders_buy[i].offer_id,
+                        order_id: self.orders_buy[i].order_id,
+                        owner_id: self.orders_buy[i].owner_id.to_string(),
+                        signer_id: self.orders_buy[i].signer_id.to_string(),
+                        exchange_rate: self.orders_buy[i].exchange_rate.to_string(),
+                        operation_amount: self.orders_buy[i].operation_amount,
+                        payment_method: self.orders_buy[i].payment_method,
+                        fiat_method: self.orders_buy[i].fiat_method,
+                        confirmation_owner_id: self.orders_buy[i].confirmation_owner_id,
+                        confirmation_signer_id: self.orders_buy[i].confirmation_signer_id,
+                        confirmation_current: self.orders_buy[i].confirmation_current,
+                        time: self.orders_buy[i].time,
+                        datetime: self.orders_buy[i].datetime.to_string(),
+                        terms_conditions: self.orders_buy[i].terms_conditions.to_string(),
+                        status: self.orders_buy[i].status,
+                    });
+                };
+            };
+        } else if signer_id.is_some() {
+            let user = signer_id.unwrap().clone();
+            for i in 0..self.orders_buy.len() {
+                if self.orders_buy[i].signer_id == user.to_string() {
                     result.push(OrderObject {
                         offer_id: self.orders_buy[i].offer_id,
                         order_id: self.orders_buy[i].order_id,
@@ -1467,7 +1545,7 @@ impl NearP2P {
 }
 
 
-fn search_offer(data: Vec<OfferObject>, amount: Option<Balance>, fiat_method: Option<i128>, payment_method: Option<i128>, is_merchant: Option<bool>) -> Vec<OfferObject> {
+fn search_offer(data: Vec<OfferObject>, amount: Option<Balance>, fiat_method: Option<i128>, payment_method: Option<i128>, is_merchant: Option<bool>, owner_id: Option<AccountId>) -> Vec<OfferObject> {
     let mut result: Vec<OfferObject> = data ;
 
     if amount.is_some() {
@@ -1546,6 +1624,25 @@ fn search_offer(data: Vec<OfferObject>, amount: Option<Balance>, fiat_method: Op
                         status: r.status, // 1: active, 2: closed).collect()
                     }).collect();
     }
+    if owner_id.is_some() {
+        result = result.iter().filter(|x| x.owner_id == owner_id.as_ref().unwrap().to_string())
+                    .map(|r| OfferObject { 
+                        offer_id: r.offer_id,
+                        owner_id: r.owner_id.clone(),
+                        asset: r.asset.clone(), // NEAR, USD
+                        exchange_rate: r.exchange_rate.clone(),
+                        amount: r.amount,
+                        remaining_amount: r.remaining_amount,
+                        min_limit: r.min_limit,
+                        max_limit: r.max_limit,
+                        payment_method: r.payment_method.iter().map(|r| PaymentMethodsOfferObject {id: r.id, payment_method: r.payment_method.clone()}).collect(), // Info concerning to payment asociated to payment contract
+                        fiat_method: r.fiat_method,
+                        is_merchant: r.is_merchant,
+                        time: r.time,
+                        terms_conditions: r.terms_conditions.clone(),
+                        status: r.status, // 1: active, 2: closed).collect()
+                    }).collect();
+    }
     
     result.iter().map(|r| OfferObject { 
         offer_id: r.offer_id,
@@ -1565,59 +1662,6 @@ fn search_offer(data: Vec<OfferObject>, amount: Option<Balance>, fiat_method: Op
     }).collect()
     
 }
-
-/*
-fn search_offer(data: Vec<OfferObject>, campo: String, valor: String) -> Vec<OfferObject> {
-    fn object_offer(index: usize, data: &Vec<OfferObject>) -> OfferObject {
-        let mut payment_method: Vec<PaymentMethodsOfferObject> = Vec::new();
-        for j in 0..data[index].payment_method.len() {
-            payment_method.push(PaymentMethodsOfferObject {
-                id: data[index].payment_method[j].id,
-                payment_method: data[index].payment_method[j].payment_method.to_string(),
-            });
-        } 
-        return OfferObject {
-            offer_id: data[index].offer_id,
-            owner_id: data[index].owner_id.to_string(),
-            asset: data[index].asset.to_string(),
-            exchange_rate: data[index].exchange_rate.to_string(),
-            amount: data[index].amount,
-            remaining_amount: data[index].remaining_amount,
-            min_limit: data[index].min_limit,
-            max_limit: data[index].max_limit,
-            payment_method: payment_method, 
-            fiat_method: data[index].fiat_method,
-            is_merchant: data[index].is_merchant,
-            time: data[index].time,
-            status: data[index].status,
-        }
-    }
-    if campo == "%" && valor == "%" {
-        return data;
-    } else {
-        let mut vector: Vec<OfferObject> = Vec::new();
-        for i in 0..data.len() {
-            if campo == "fiat_method" && data[i].offer_id == valor.parse::<i128>().unwrap().into() {
-                vector.push(object_offer(i, &data));
-            }
-            if campo == "payment_method" && data[i].owner_id == valor.to_string() {
-                vector.push(object_offer(i, &data));
-            }
-            if campo == "asset" && data[i].asset == valor.to_string() {
-                vector.push(object_offer(i, &data));
-            }
-            if campo == "amount" && data[i].amount == valor.parse::<u128>().unwrap().into() {
-                vector.push(object_offer(i, &data));
-            }
-            if campo == "amount" && data[i].amount == valor.parse::<u128>().unwrap().into() {
-                vector.push(object_offer(i, &data));
-            }
-        }
-        return vector
-    }
-}
-*/
-
 
 
 // use the attribute below for unit tests

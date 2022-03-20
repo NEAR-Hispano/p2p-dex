@@ -1,140 +1,150 @@
 <template>
-<page-layout>
-  <div slot="headerContent">
+  <page-layout>
+    <div slot="headerContent">
       <div class="subtitle">
-        <h3>{{ $t('pageDesc') }}</h3>
+        <h3>{{ $t("pageDesc") }}</h3>
       </div>
     </div>
-      <template slot="extra">
-      <head-info class="split-right" style="color: red !important" :title="$t('project')" content="1"/>
+    <template slot="extra">
+      <head-info-orders
+        class="split-right"
+        style="color: red !important"
+        :title="$t('project')"
+        :content="active_orders"
+      />
       <head-info class="split-right" :title="$t('ranking')" content="90%" />
     </template>
-  <div>
-    <a-card :title="title" class="card">
-      <a-row type="flex">
-        <a-col :xxl="2" :xl="4" :lg="4" :md="24" :sm="24" :xs="24">
-          <a-radio-group default-value="sell" button-style="solid">
-            <a-tooltip :title="$t('longbuy')">
-              <a-radio-button value="buy" @click="fetchBuy">
-                {{ buy }}
-              </a-radio-button>
-            </a-tooltip>
-            <a-tooltip :title="$t('longsell')">
-              <a-radio-button value="sell" @click="fetchSell">
-                {{ sell }}
-              </a-radio-button>
-            </a-tooltip>
-          </a-radio-group>
-        </a-col>
-        <a-col :xxl="22" :xl="20" :lg="20" :md="24" :sm="24" :xs="24">
-          <a-tabs default-active-key="1" @change="callback">
-            <a-tab-pane key="1" tab="NEAR">
-              <a-row type="flex" gutter="4">
-                <a-col :xxl="6" :xl="6" :lg="6" :md="24" :sm="24" :xs="24">
-                  <a-form-item :label="$t('amount')" style="margin-top:5px">
-                    <a-input-search
-                      :placeholder="enteramount"
-                      :enter-button="search"
-                      v-model="amount"
-                      style="width: 99%"
-                      @search="amountHandleChange"
-                    />
-                  </a-form-item>
-                </a-col>
-                <a-col :xxl="6" :xl="6" :lg="6" :md="24" :sm="24" :xs="24">
-                  <a-form-item :label="$t('fiat')">
-                    <a-select
-                      show-search
-                      :placeholder="selectfiat"
-                      option-filter-prop="children"
-                      @change="fiatHandleChange"
-                      :filter-option="filterOptionFlag"
-                      style="width: 99%;margin-top: 5px"
-                    >
-                      <a-select-option
-                        v-for="i in listFiats"
-                        :key="i.id"
-                        :value="i.id"
+    <div>
+      <a-card :title="title" class="card">
+        <a-row type="flex">
+          <a-col :xxl="2" :xl="4" :lg="4" :md="24" :sm="24" :xs="24">
+            <a-radio-group default-value="sell" button-style="solid">
+              <a-tooltip :title="$t('longbuy')">
+                <a-radio-button value="buy" @click="fetchBuy">
+                  {{ buy }}
+                </a-radio-button>
+              </a-tooltip>
+              <a-tooltip :title="$t('longsell')">
+                <a-radio-button value="sell" @click="fetchSell">
+                  {{ sell }}
+                </a-radio-button>
+              </a-tooltip>
+            </a-radio-group>
+          </a-col>
+          <a-col :xxl="22" :xl="20" :lg="20" :md="24" :sm="24" :xs="24">
+            <a-tabs default-active-key="1" @change="callback">
+              <a-tab-pane key="1" tab="NEAR">
+                <a-row type="flex" gutter="4">
+                  <a-col :xxl="6" :xl="6" :lg="6" :md="24" :sm="24" :xs="24">
+                    <a-form-item :label="$t('amount')" style="margin-top:5px">
+                      <a-input-search
+                        :placeholder="enteramount"
+                        :enter-button="search"
+                        v-model="amount"
+                        style="width: 99%"
+                        @search="amountHandleChange"
+                      />
+                    </a-form-item>
+                  </a-col>
+                  <a-col :xxl="6" :xl="6" :lg="6" :md="24" :sm="24" :xs="24">
+                    <a-form-item :label="$t('fiat')">
+                      <a-select
+                        show-search
+                        :placeholder="selectfiat"
+                        option-filter-prop="children"
+                        @change="fiatHandleChange"
+                        :filter-option="filterOptionFlag"
+                        style="width: 99%;margin-top: 5px"
                       >
-                        <img
-                          :src="i.flagcdn"
-                          width="16"
-                          height="12"
-                          style="margin-right: 10px"
-                          alt="flagcdn"
-                        />
-                        {{ i.fiat_method }}
-                      </a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :xxl="6" :xl="6" :lg="6" :md="24" :sm="24" :xs="24">
-                  <a-form-item :label="$t('payments')">
-                    <a-select
-                      show-search
-                      :placeholder="allpayments"
-                      option-filter-prop="children"
-                      @change="paymentHandleChange"
-                      style="width: 99%;margin-top: 5px"
-                    >
-                      <a-select-option
-                        v-for="i in listPayments"
-                        :key="i.id"
-                        :value="i.id"
-                        :filter-option="filterOption"
+                        <a-select-option
+                          v-for="i in listFiats"
+                          :key="i.id"
+                          :value="i.id"
+                        >
+                          <img
+                            :src="i.flagcdn"
+                            width="16"
+                            height="12"
+                            style="margin-right: 10px"
+                            alt="flagcdn"
+                          />
+                          {{ i.fiat_method }}
+                        </a-select-option>
+                      </a-select>
+                    </a-form-item>
+                  </a-col>
+                  <a-col :xxl="6" :xl="6" :lg="6" :md="24" :sm="24" :xs="24">
+                    <a-form-item :label="$t('payments')">
+                      <a-select
+                        show-search
+                        :placeholder="allpayments"
+                        option-filter-prop="children"
+                        @change="paymentHandleChange"
+                        style="width: 99%;margin-top: 5px"
                       >
-                        {{ i.payment_method }}
-                      </a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col :xxl="6" :xl="6" :lg="6" :md="24" :sm="24" :xs="24">
-                  <a-checkbox
-                    @change="onChange"
-                    :checked="checked"
-                    style="margin-top: 50px; margin-left: 15px;"
-                  >
-                    {{ merchantad }}
-                  </a-checkbox>
-                </a-col>
-                <a-col :xxl="22" :xl="22" :lg="24" :md="24" :sm="24" :xs="24">
-                  <p2p-table-near
-                    ref="tablenear"
-                  ></p2p-table-near>
-                </a-col>
-              </a-row>
-            </a-tab-pane>
-          </a-tabs>
-        </a-col>
-      </a-row>
-    </a-card>
-  </div>
-</page-layout> 
+                        <a-select-option
+                          v-for="i in listPayments"
+                          :key="i.id"
+                          :value="i.id"
+                          :filter-option="filterOption"
+                        >
+                          {{ i.payment_method }}
+                        </a-select-option>
+                      </a-select>
+                    </a-form-item>
+                  </a-col>
+                  <a-col :xxl="6" :xl="6" :lg="6" :md="24" :sm="24" :xs="24">
+                    <a-checkbox
+                      @change="onChange"
+                      :checked="checked"
+                      style="margin-top: 50px; margin-left: 15px;"
+                    >
+                      {{ merchantad }}
+                    </a-checkbox>
+                  </a-col>
+                  <a-col :xxl="22" :xl="22" :lg="24" :md="24" :sm="24" :xs="24">
+                    <p2p-table-near ref="tablenear"></p2p-table-near>
+                  </a-col>
+                </a-row>
+              </a-tab-pane>
+            </a-tabs>
+          </a-col>
+        </a-row>
+      </a-card>
+    </div>
+  </page-layout>
 </template>
 <script>
 import P2pTableNear from "./P2pTableNEAR";
 import PageLayout from "@/layouts/PageLayout";
 import HeadInfo from "@/components/tool/HeadInfo";
+import HeadInfoOrders from "@/components/tool/HeadInfoOrders";
 import * as nearAPI from "near-api-js";
 import { CONFIG } from "@/services/api";
+import { mapGetters } from "vuex";
 
 export default {
   name: "P2P",
   components: {
     P2pTableNear,
     PageLayout,
-    HeadInfo
+    HeadInfo,
+    HeadInfoOrders
   },
   i18n: require("./i18n"),
   computed: {
     desc() {
-      return this.$t('pageDesc')
-    }
+      return this.$t("pageDesc");
+    },
+    ...mapGetters("account", ["userInfo"])
   },
   data() {
     return {
       listPayments: [],
       listFiats: [],
+      orderssell: [],
+      ordersbuy: [],
+      active_orders: "0",
       checked: true,
       merchantad: this.$t("merchantad"),
       buy: this.$t("buy"),
@@ -145,11 +155,22 @@ export default {
       globalkey: "1",
       title: this.$t("title"),
       search: this.$t("search"),
-      amount: "",
+      amount: ""
     };
   },
   mounted() {
     this.fetchSelects();
+
+    if(localStorage.getItem("userlength") == 0){
+      this.$router.push("/account/myaccount");
+    }
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+
+    if (urlParams.get('transactionHashes') !== null) {
+      window.history.pushState({}, document.title, "/nearp2p/#/trade/p2p");
+    }
   },
   methods: {
     fiatHandleChange(value) {
@@ -212,7 +233,13 @@ export default {
       const wallet = new WalletConnection(near);
       // console.log(near);
       const contract = new Contract(wallet.account(), CONTRACT_NAME, {
-        viewMethods: ["get_payment_method", "get_fiat_method", "get_merchant"],
+        viewMethods: [
+          "get_payment_method",
+          "get_fiat_method",
+          "get_merchant",
+          "get_order_sell",
+          "get_order_buy"
+        ],
         changeMethods: ["set_payment_method"],
         sender: wallet.account()
       });
@@ -223,8 +250,16 @@ export default {
           a.payment_method > b.payment_method ? 1 : -1
         );
         this.listFiats.sort((a, b) => (a.fiat_method > b.fiat_method ? 1 : -1));
+
+        this.orderssell = await contract.get_order_sell({
+            user_id: this.userInfo,
+        });
+        this.ordersbuy = await contract.get_order_buy({
+            user_id: this.userInfo,
+        });
+        this.active_orders = parseInt(this.orderssell.length) + parseInt(this.ordersbuy.length);
       }
-    },
+    }
   }
 };
 </script>

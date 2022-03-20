@@ -52,7 +52,7 @@ export default {
   methods: {
     ...mapMutations("account", ["setUser", "setUserInfo", "setUserAvatar"]),
     afterLogin(res) {
-      console.log('after login')
+      //console.log('after login')
       var today = new Date(); 
       const loginRes = res;
       this.setUserInfo(loginRes.get('account_id'))
