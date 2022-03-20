@@ -25,16 +25,13 @@ const options = {
       name: '403',
       component: () => import('@/pages/exception/403'),
     },
+    
     /*Trade Detail*/
     {
       path: '/d',
+      name: 'd',
       component: TabsView,
       children: [
-        {
-          path: 'dashboard',
-          name: 'dashboard',
-          component: BlankView,
-        },
         {
           path: 'trade',
           name: 'trade',
@@ -105,10 +102,63 @@ const options = {
               component: () => import('@/pages/form/p2p'),
             },
             {
+              path: 'p2pdetail',
+              name: 'p2pdetail',
+              meta: {
+                icon: 'unordered-list',
+              },
+              component: () => import('@/pages/form/p2porders'),
+            },
+            {
               path: 'offer',
               name: 'offer',
               meta: {
                 icon: 'user-add',
+              },
+              component: () => import('@/pages/form/account'),
+            },
+            {
+              path: 'merchant',
+              name: 'merchant',
+              meta: {
+                icon: 'audit',
+              },
+              component: () => import('@/pages/form/account'),
+            },
+          ]
+        },
+        {
+          path: 'account',
+          name: 'account',
+          meta: {
+            icon: 'setting',
+            page: {
+              cacheAble: false
+            }
+          },
+          component: BlankView,
+          children: [
+            {
+              path: 'myaccount',
+              name: 'myaccount',
+              meta: {
+                icon: 'user',
+              },
+              component: () => import('@/pages/form/account'),
+            },
+            {
+              path: 'bank',
+              name: 'bank',
+              meta: {
+                icon: 'bank',
+              },
+              component: () => import('@/pages/form/bank'),
+            },
+            {
+              path: 'history',
+              name: 'history',
+              meta: {
+                icon: 'unordered-list',
               },
               component: () => import('@/pages/form/account'),
             },

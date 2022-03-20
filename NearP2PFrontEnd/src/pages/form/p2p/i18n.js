@@ -1,8 +1,8 @@
 module.exports = {
   messages: {
     ES: {
-      pageDesc: 'Peer-to-peer exchange (or P2P exchange) is a marketplace where people can trade crypto directly with each other on their own terms, in virtually any country.',
-      project: 'Ordenes pendientes',
+      pageDesc: 'Peer-to-peer exchange (or P2P exchange) is a marketplace where people can trade crypto directly with each other on their own terms, in any country.',
+      project: 'Ordenes pendientes P2P',
       ranking: 'Ranqueo',
       title: 'Opciones Punto a Punto',
       requiredfield: 'Campo requerido',
@@ -60,8 +60,8 @@ module.exports = {
       minutes: 'Minutos',
     },
     US: {
-      pageDesc: 'Peer-to-peer exchange (or P2P exchange) is a marketplace where people can trade crypto directly with each other on their own terms, in virtually any country.',
-      project: 'Pending orders',
+      pageDesc: 'Peer-to-peer exchange (or P2P exchange) is a marketplace where people can trade crypto directly with each other on their own terms, in any country.',
+      project: 'Pending orders P2P',
       ranking: 'Ranking',
       title: 'Peer to Peer options',
       requiredfield: 'Required field',

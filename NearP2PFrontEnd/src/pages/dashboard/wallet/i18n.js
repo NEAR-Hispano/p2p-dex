@@ -1,7 +1,7 @@
 module.exports = {
   messages: {
     ES: {
-      project: 'Ordenes pendientes',
+      project: 'Ordenes pendientes P2P',
       ranking: 'Ranqueo',
       access: 'Inicio rápido / Nevegación fácil',
       goodmorning: 'Buenos días',
@@ -18,7 +18,7 @@ module.exports = {
       tether: 'Tether USD',
     },
     US: {
-      project: 'Pending orders',
+      project: 'Pending orders P2P',
       ranking: 'Ranking',
       access: 'Quick start / Easy navigation',
       goodmorning: 'Good morning',
