@@ -11,15 +11,21 @@
     <div>
       <a-card :title="title" class="card" style="width:94%; margin-left:3%">
         <a-tabs default-active-key="1" @change="callback">
-          <a-tab-pane key="sell" :tab="sell">
-            <a-table :columns="columns" :data-source="data" :loading="loading">
+          <a-tab-pane key="sell" :tab="buy">
+            <a-table
+              :columns="columns"
+              :data-source="databuy"
+              :loading="loading"
+            >
               <template slot="operation_amount" slot-scope="text">
-                <span style="font-size:0.7rem; padding-left: 2px">{{
-                  text }} NEAR</span>
+                <span style="font-size:0.7rem; padding-left: 2px"
+                  >{{ text }} NEAR</span
+                >
               </template>
               <template slot="fiat_method" slot-scope="text, record">
                 <span style="font-size:0.7rem; padding-left: 2px">{{
-                  getFiat(record.fiat_method) }}</span>
+                  getFiat(record.fiat_method)
+                }}</span>
               </template>
               <template slot="action" slot-scope="text, record">
                 <a-button
@@ -33,15 +39,17 @@
               </template>
             </a-table>
           </a-tab-pane>
-          <a-tab-pane key="buy" :tab="buy">
-            <a-table :columns="columns" :data-source="databuy" :loading="loading">
+          <a-tab-pane key="buy" :tab="sell">
+            <a-table :columns="columns" :data-source="data" :loading="loading">
               <template slot="operation_amount" slot-scope="text">
-                <span style="font-size:0.7rem; padding-left: 2px">{{
-                  text }} NEAR</span>
+                <span style="font-size:0.7rem; padding-left: 2px"
+                  >{{ text }} NEAR</span
+                >
               </template>
               <template slot="fiat_method" slot-scope="text, record">
                 <span style="font-size:0.7rem; padding-left: 2px">{{
-                  getFiat(record.fiat_method) }}</span>
+                  getFiat(record.fiat_method)
+                }}</span>
               </template>
               <template slot="action" slot-scope="text, record">
                 <a-button
@@ -67,8 +75,6 @@ import * as nearAPI from "near-api-js";
 import { CONFIG } from "@/services/api";
 import { mapGetters } from "vuex";
 
-const dataSource = [];
-
 export default {
   name: "P2POrders",
   components: {
@@ -80,9 +86,9 @@ export default {
     desc() {
       return this.$t("pageDesc");
     },
-  computedClass() {
+    computedClass() {
       let className = "button-near-sell";
-      if (this.typeoffer == "sell") {
+      if (this.typeoffer == "buy") {
         className = "button-near-sell";
       } else {
         className = "button-near-buy";
@@ -96,8 +102,8 @@ export default {
       columns: [
         {
           title: this.$t("merchant"),
-          dataIndex: "owner_id",
-          key: "owner_id"
+          dataIndex: "signer_id",
+          key: "signer_id"
         },
         {
           title: this.$t("amount"),
@@ -136,12 +142,11 @@ export default {
       buttonText: this.$t("action"),
       sell: this.$t("ordersSell"),
       buy: this.$t("ordersBuy"),
-      dataSource
     };
   },
   mounted() {
     this.fetch();
-    if(localStorage.getItem("userlength") == 0){
+    if (localStorage.getItem("userlength") == 0) {
       this.$router.push("/account/myaccount");
     }
   },
@@ -165,11 +170,11 @@ export default {
       });
       if (wallet.isSignedIn()) {
         this.listFiats = await contract.get_fiat_method();
-        this.data = await contract.get_order_sell({
-         signer_id: this.userInfo,
+        this.databuy = await contract.get_order_sell({
+          owner_id: this.userInfo,
         });
-        this.databuy = await contract.get_order_buy({
-          signer_id: this.userInfo,
+        this.data = await contract.get_order_buy({
+          owner_id: this.userInfo,
         });
       }
       this.loading = false;

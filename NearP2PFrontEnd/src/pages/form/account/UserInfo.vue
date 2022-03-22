@@ -3,7 +3,8 @@
     <a-drawer
       width="auto"
       placement="right"
-      :closable="false"
+      bodyStyle="max-width:750px"
+      :closable="true"
       :visible="visible"
       @close="onClose"
     >
@@ -61,16 +62,6 @@
         <a-col :span="12">
           <p>
           {{ admin }}
-          </p>
-        </a-col>
-      </a-row>
-       <a-row :gutter="30">
-        <a-col :span="12">
-          <p style="font-weight:bold">{{ $t('typemediador') }}:</p>
-        </a-col>
-        <a-col :span="12">
-          <p>
-          {{ mediator }}
           </p>
         </a-col>
       </a-row>

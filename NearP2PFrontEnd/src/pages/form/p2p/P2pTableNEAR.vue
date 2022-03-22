@@ -57,7 +57,6 @@
       <template slot="action" slot-scope="text , record, index">
         <a-button
           type="primary"
-          size="large"
           @click="
             showDrawer(
               record.remaining_amount,
@@ -83,12 +82,15 @@
     <!--- Drawer --->
     <a-drawer
       width="auto"
+      :title="drawertittle"
+      bodyStyle="max-width:750px"
       placement="right"
-      :closable="false"
+      :closable="true"
       :visible="visible"
       @close="onClose"
     >
       <a-row :gutter="16">
+        <p style="font-weight:bold;" class="image-responsive-lg image-responsive-md image-responsive-sm">{{ $t('drawerinfo') }}:</p>
         <a-col :xxl="24" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
           <p style="font-size: 16px; font-weight: bold;">
             {{ $t("terms") }}
@@ -497,7 +499,8 @@ export default {
       filter_amount: 0,
       filter_fiat_method: null,
       filter_payment_method: null,
-      filter_is_merchant: true
+      filter_is_merchant: true,
+      drawertittle: this.$t("drawertittle"),
     };
   },
   async mounted() {

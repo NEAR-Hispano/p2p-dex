@@ -58,6 +58,8 @@ module.exports = {
       nobalance: 'No hay balance suficiente para cubrir la transacción',
       totalbalance: 'Si tu balance es menor al total de la oferta, el botón colocará el total del balance',
       minutes: 'Minutos',
+      drawertittle: 'Agregar nueva oferta',
+      drawerinfo: 'Llene la forma para completar la tares',
     },
     US: {
       pageDesc: 'Peer-to-peer exchange (or P2P exchange) is a marketplace where people can trade crypto directly with each other on their own terms, in any country.',
@@ -117,6 +119,8 @@ module.exports = {
       nobalance: 'Not enough balance to cover this transaction',
       totalbalance: 'If your balance is less than total offer, this buttom will put your total balance',
       minutes: 'Minutes',
+      drawertittle: 'Add New Offer',
+      drawerinfo: 'Fill the form to complete the task',
     }
   }
 }
