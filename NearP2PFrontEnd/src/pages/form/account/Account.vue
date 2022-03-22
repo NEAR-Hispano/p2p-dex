@@ -15,7 +15,7 @@
       <head-info class="split-right" :title="$t('ranking')" content="90%" />
     </template>
     <div>
-      <a-card :title="$t('accountData')" class="card">
+      <a-card :title="$t('accountData')" class="card" style="width:94%; margin-left:3%">
         <a-form :form="form" @submit="handleSubmit">
           <a-row type="flex">
             <a-col :xxl="4" :xl="4" :lg="4" />
@@ -152,10 +152,10 @@ export default {
       });
       if (wallet.isSignedIn()) {
         this.orderssell = await contract.get_order_sell({
-          user_id: this.userInfo
+          signer_id: this.userInfo
         });
         this.ordersbuy = await contract.get_order_buy({
-          user_id: this.userInfo
+          signer_id: this.userInfo
         });
         this.active_orders =
           parseInt(this.orderssell.length) + parseInt(this.ordersbuy.length);

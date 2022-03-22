@@ -115,7 +115,7 @@ const options = {
               meta: {
                 icon: 'user-add',
               },
-              component: () => import('@/pages/form/account'),
+              component: () => import('@/pages/form/placeoffer'),
             },
             {
               path: 'merchant',
@@ -123,7 +123,7 @@ const options = {
               meta: {
                 icon: 'audit',
               },
-              component: () => import('@/pages/form/account'),
+              component: () => import('@/pages/form/merchants'),
             },
           ]
         },

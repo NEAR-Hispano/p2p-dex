@@ -64,16 +64,6 @@
           </p>
         </a-col>
       </a-row>
-       <a-row :gutter="30">
-        <a-col :span="12">
-          <p style="font-weight:bold">{{ $t('typemediador') }}:</p>
-        </a-col>
-        <a-col :span="12">
-          <p>
-          {{ mediator }}
-          </p>
-        </a-col>
-      </a-row>
       <a-row :gutter="30">
         <a-col :span="12">
           <p style="font-weight:bold">{{ $t('typeactive') }}:</p>
@@ -159,7 +149,7 @@ export default {
       this.mediator = this.data[0].mediator;
       this.admin = this.data[0].admin;
       this.is_active = this.data[0].is_active;
-    },
+    }
   }
 };
 </script>

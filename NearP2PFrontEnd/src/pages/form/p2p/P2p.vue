@@ -15,7 +15,7 @@
       <head-info class="split-right" :title="$t('ranking')" content="90%" />
     </template>
     <div>
-      <a-card :title="title" class="card">
+      <a-card :title="title" class="card" style="width:94%; margin-left:3%">
         <a-row type="flex">
           <a-col :xxl="2" :xl="4" :lg="4" :md="24" :sm="24" :xs="24">
             <a-radio-group default-value="sell" button-style="solid">
@@ -252,11 +252,12 @@ export default {
         this.listFiats.sort((a, b) => (a.fiat_method > b.fiat_method ? 1 : -1));
 
         this.orderssell = await contract.get_order_sell({
-            user_id: this.userInfo,
+            signer_id: this.userInfo,
         });
         this.ordersbuy = await contract.get_order_buy({
-            user_id: this.userInfo,
+            signer_id: this.userInfo,
         });
+
         this.active_orders = parseInt(this.orderssell.length) + parseInt(this.ordersbuy.length);
       }
     }

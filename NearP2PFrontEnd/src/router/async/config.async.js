@@ -4,8 +4,6 @@ import {parseRoutes} from '@/utils/routerUtil'
 // Asynchronous routing configuration
 const routesConfig = [
   'login',
-  'passwordreset',
-  'passwordset',
   'root',
   {
     router: 'exp404',

@@ -6,7 +6,11 @@
       </div>
     </div>
     <template slot="extra">
-      <head-info-orders class="split-right" :title="$t('project')" :content="active_orders" />
+      <head-info-orders
+        class="split-right"
+        :title="$t('project')"
+        :content="active_orders"
+      />
       <head-info class="split-right" :title="$t('ranking')" content="90%" />
     </template>
     <template>
@@ -35,7 +39,7 @@
             <a-row type="flex" style="margin-top: 50px">
               <a-col :xxl="14" :xl="14" :lg="14" :md="14" :sm="14" :xs="24">
                 <p style="font-size: 18px">
-                  {{ $t('near') }}
+                  {{ $t("near") }}
                 </p>
               </a-col>
               <a-col :xxl="10" :xl="10" :lg="10" :md="10" :sm="10" :xs="24">
@@ -43,17 +47,23 @@
                   ≈ $ {{ balanceDollar | numericFormat(numericFormatConfig) }}
                 </p>
                 <p class="balance-near">{{ balance }} NEAR</p>
-                <p class="balance-near">$ {{ lastPrice.lastPrice | numericFormat(numericFormatConfig) }}</p>
+                <p class="balance-near">
+                  $
+                  {{ lastPrice.lastPrice | numericFormat(numericFormatConfig) }}
+                </p>
               </a-col>
             </a-row>
             <a-row type="flex" style="margin-top: 50px;">
               <a-col :xxl="14" :xl="14" :lg="14" :md="14" :sm="14" :xs="24">
                 <p style="font-size: 18px">
-                   {{ $t('tether') }}
+                  {{ $t("tether") }}
                 </p>
               </a-col>
               <a-col :xxl="10" :xl="10" :lg="10" :md="10" :sm="10" :xs="24">
-                <p class="balance">= $ {{ tether/1000000 | numericFormat(numericFormatConfig) }}</p>
+                <p class="balance">
+                  = $
+                  {{ (tether / 1000000) | numericFormat(numericFormatConfig) }}
+                </p>
               </a-col>
             </a-row>
           </a-card>
@@ -107,7 +117,14 @@ import HeadInfoOrders from "@/components/tool/HeadInfoOrders";
 import * as nearAPI from "near-api-js";
 import { BINANCE_NEAR } from "@/services/api";
 import { CONFIG } from "@/services/api";
-const { connect, keyStores, WalletConnection, providers, Contract, utils } = nearAPI;
+const {
+  connect,
+  keyStores,
+  WalletConnection,
+  providers,
+  Contract,
+  utils
+} = nearAPI;
 const NOMBRE = process.env.VUE_APP_NAME;
 
 export default {
@@ -128,7 +145,7 @@ export default {
       teams: [],
       welcome: {
         timeFix: "",
-        message: "",
+        message: ""
       },
       design: [],
       balance: "",
@@ -178,13 +195,6 @@ export default {
     //setTimeout(this.fetch(), 1000);
     this.getBalance();
     this.getBalanceTether();
-
-    //const queryString = window.location.search;
-    //const urlParams = new URLSearchParams(queryString);
-
-    //if (urlParams.get('account_id') !== null) {
-      //window.history.pushState({}, document.title, "/nearp2p/#/dashboard/wallet");
-    //}
   },
   methods: {
     fetch() {
@@ -198,7 +208,9 @@ export default {
     async getBalance() {
       // connect to NEAR
       //console.log(new keyStores.BrowserLocalStorageKeyStore())
-      const near = await connect(CONFIG(new keyStores.BrowserLocalStorageKeyStore()));
+      const near = await connect(
+        CONFIG(new keyStores.BrowserLocalStorageKeyStore())
+      );
       const wallet = new WalletConnection(near);
 
       const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME;
@@ -209,7 +221,7 @@ export default {
         sender: wallet.account()
       });
       var user = [];
-      //console.log(wallet.account());
+      console.log(wallet.isSignedIn());
       if (wallet.isSignedIn()) {
         const accountId = wallet.getAccountId();
         // gets account balance
@@ -220,22 +232,34 @@ export default {
         const restar = utils.format.formatNearAmount("50000000000000000000000");
         // this.balance = parseFloat(balance.total)/10**24
         this.balance = (dipo - restar).toFixed(5);
-        localStorage.setItem("wallet_balance", this.balance); 
+        localStorage.setItem("wallet_balance", this.balance);
         this.balanceDollar = this.balance * this.lastPrice.lastPrice;
         this.balanceblock = (0.25 * this.lastPrice.lastPrice).toFixed(2);
 
         this.orderssell = await contract.get_order_sell({
-            user_id: this.userInfo,
+          signer_id: this.userInfo
         });
         this.ordersbuy = await contract.get_order_buy({
-            user_id: this.userInfo,
+          signer_id: this.userInfo
         });
 
         user = await contract.get_user({
-            user_id: this.userInfo,
+          user_id: this.userInfo
         });
         localStorage.setItem("userlength", user.length);
-        this.active_orders = parseInt(this.orderssell.length) + parseInt(this.ordersbuy.length);
+        this.active_orders =
+          parseInt(this.orderssell.length) + parseInt(this.ordersbuy.length);
+
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+
+        if (urlParams.get("account_id") !== null) {
+          window.history.pushState(
+            {},
+            document.title,
+            "/nearp2p/#/dashboard/wallet"
+          );
+        }
       }
     },
     async getBalanceTether() {
@@ -254,9 +278,9 @@ export default {
         sender: wallet.account()
       });
       if (wallet.isSignedIn()) {
-          this.tether = await contract.ft_balance_of({
-            account_id: wallet.getAccountId(),
-          });
+        this.tether = await contract.ft_balance_of({
+          account_id: wallet.getAccountId()
+        });
         // console.log("tether", this.tether/1000000);
       }
     },
@@ -268,8 +292,8 @@ export default {
       );
       //  create wallet connection
       const wallet = new WalletConnection(near, NOMBRE); // autorizamos la conexion a una wallet
-       //preguntamos si hay una sesion activa
-      const accountId = wallet.getAccountId() 
+      //preguntamos si hay una sesion activa
+      const accountId = wallet.getAccountId();
 
       // block hash of query start (oldest block)
       //const startBlock = "7svwjRr6UWykHx5ArgtnySLvxu9UTb1uLM6sBVpiaGDL";
@@ -282,7 +306,7 @@ export default {
       const blockArr = [];
       let blockHash = endBlock;
       let limite = 5;
-      for(let i=0;i<limite;i++) {
+      for (let i = 0; i < limite; i++) {
         const currentBlock = await this.getBlockByID(blockHash);
         //console.log(currentBlock)
         blockArr.push(currentBlock.header.hash);
@@ -292,15 +316,15 @@ export default {
       // returns block details based on hashes in array
       //console.log(near)
       const blockDetails = await Promise.all(
-        blockArr.map((blockId) =>
+        blockArr.map(blockId =>
           near.connection.provider.block({
-            blockId,
+            blockId
           })
         )
       );
 
       // returns an array of chunk hashes from block details
-      const chunkHashArr = blockDetails.flatMap((block) =>
+      const chunkHashArr = blockDetails.flatMap(block =>
         block.chunks.map(({ chunk_hash }) => chunk_hash)
       );
 
@@ -311,37 +335,40 @@ export default {
       // checks chunk details for transactions
       // if there are transactions in the chunk we
       // find ones associated with passed accountId
-      const transactions = chunkDetails.flatMap((chunk) =>
-        (chunk.transactions || []).filter((tx) => tx.signer_id === accountId)
+      const transactions = chunkDetails.flatMap(chunk =>
+        (chunk.transactions || []).filter(tx => tx.signer_id === accountId)
       );
 
       //creates transaction links from matchingTxs
-      const txsLinks = transactions.map((txs) => ({
+      const txsLinks = transactions.map(txs => ({
         //method: txs.actions[0].FunctionCall.method_name,
-        link: `https://explorer.testnet.near.org/transactions/${txs.hash}`,
+        link: `https://explorer.testnet.near.org/transactions/${txs.hash}`
       }));
       console.log("MATCHING TRANSACTIONS: ", transactions);
       console.log("TRANSACTION LINKS: ", txsLinks);
-      var title = ''
-      if(transactions[0].actions[0].AddKey.access_key.permission == "FullAccess") {
-        title = "Access Key added"
+      var title = "";
+      if (
+        transactions[0].actions[0].AddKey.access_key.permission == "FullAccess"
+      ) {
+        title = "Access Key added";
       }
       this.data = [
         {
           title: title,
-          avatar: "https://img.icons8.com/material/24/26e07f/left-down2--v1.png",
+          avatar:
+            "https://img.icons8.com/material/24/26e07f/left-down2--v1.png",
           from: "From : " + transactions[0].signer_id,
           time: "1H",
-          links: txsLinks[0].link,
-        },
-      ]
+          links: txsLinks[0].link
+        }
+      ];
     },
     async getBlockByID(blockID) {
       const near = await connect(
         CONFIG(new keyStores.BrowserLocalStorageKeyStore())
       );
       const blockInfoByHeight = await near.connection.provider.block({
-        blockId: blockID,
+        blockId: blockID
       });
       return blockInfoByHeight;
     },
@@ -351,8 +378,8 @@ export default {
       );
       //  create wallet connection
       const wallet = new WalletConnection(near, NOMBRE); // autorizamos la conexion a una wallet
-       //preguntamos si hay una sesion activa
-      const walletAccountId = wallet.getAccountId() 
+      //preguntamos si hay una sesion activa
+      const walletAccountId = wallet.getAccountId();
       //network config (replace testnet with mainnet or betanet)
       const provider = new providers.JsonRpcProvider(
         "https://archival-rpc.testnet.near.org"
@@ -374,8 +401,8 @@ export default {
       // create wallet connection
       const wallet = new WalletConnection(near, NOMBRE); // creamos la conexion a una wallet
       const accountId = wallet.getAccountId();
-      window.open("https://explorer.testnet.near.org/accounts/" + accountId)
-    },
+      window.open("https://explorer.testnet.near.org/accounts/" + accountId);
+    }
   }
 };
 </script>
