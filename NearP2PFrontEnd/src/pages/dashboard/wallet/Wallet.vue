@@ -11,7 +11,7 @@
         :title="$t('project')"
         :content="active_orders"
       />
-      <head-info class="split-right" :title="$t('ranking')" content="90%" />
+      <head-info class="split-right" :title="$t('ranking')" :content="percentage_complete || '0%'" />
     </template>
     <template>
       <a-row type="flex">
@@ -137,6 +137,8 @@ export default {
       orderssell: [],
       ordersbuy: [],
       active_orders: "0",
+      listMechants: [],
+      percentage_complete: "0",
       tether: [],
       lastPrice: [],
       projects: [],
@@ -216,7 +218,7 @@ export default {
       const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME;
 
       const contract = new Contract(wallet.account(), CONTRACT_NAME, {
-        viewMethods: ["get_order_sell", "get_order_buy", "get_user"],
+        viewMethods: ["get_order_sell", "get_order_buy", "get_user","get_merchant"],
         changeMethods: [],
         sender: wallet.account()
       });
@@ -246,6 +248,12 @@ export default {
         user = await contract.get_user({
           user_id: this.userInfo
         });
+
+        this.listMechants = await contract.get_merchant({
+            user_id: this.userInfo,
+        });
+        this.percentage_complete = this.listMechants[0].percentage_complete;
+
         localStorage.setItem("userlength", user.length);
         this.active_orders =
           parseInt(this.orderssell.length) + parseInt(this.ordersbuy.length);

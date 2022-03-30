@@ -91,50 +91,37 @@ export default {
       isloading: false,
       uploadValue: 0,
       imageData: null,
-      room : 'room' + this.$route.query.order
+      room: "room" + this.$route.query.order
       //picture: 'url',
     };
-  },
-  async beforeMount() {
-    // console.log(this.room)
-    // console.log(this.userInfo)
-    const room1Ref = db.collection(this.room);
-    const snapshot = await room1Ref.where("displayName", "==", "NEAR").get();
-    if (!snapshot.empty) {
-      this.login();
-      setTimeout(this.login(), 5000);
-    }
   },
   async mounted() {
     // RUTINA PARA CREAR LA SALA DE CHAT
     const room1Ref = db.collection(this.room);
     const snapshot = await room1Ref.where("displayName", "==", "NEAR").get();
-    if (snapshot.empty) {
-      this.login();
-      setTimeout(this.login(), 5000);
-
-      const messageInfo = {
-        userUID: this.user.uid,
-        displayName: "NEAR",
-        text:
-         this.$t("chat_text"),
-        created: 0
-      };
-      db.collection(this.room).add(messageInfo);
-      db.collection(this.room)
-        .orderBy("created")
-        .onSnapshot(querySnap => {
-          this.messages = querySnap.docs.map(doc => doc.data());
-        });
-      this.$refs["scrollable"].scrollIntoView({ behavior: "smooth" });
-      return;
-    }
-    db.collection(this.room)
-      .orderBy("created")
-      .onSnapshot(querySnap => {
-        this.messages = querySnap.docs.map(doc => doc.data());
+    console.log(snapshot);
+    if (!snapshot.empty) {
+      const auth = getAuth();
+      signInAnonymously(auth).then(() => {
+        this.user = auth.currentUser;
+        const messageInfo = {
+          userUID: this.user.uid,
+          displayName: "NEAR",
+          text: this.$t("chat_text"),
+          created: 0
+        };
+        console.log(messageInfo);
+        console.log(this.room);
+        db.collection(this.room).add(messageInfo);
+        db.collection(this.room)
+          .orderBy("created")
+          .onSnapshot(querySnap => {
+            this.messages = querySnap.docs.map(doc => doc.data());
+          });
+        this.$refs["scrollable"].scrollIntoView({ behavior: "smooth" });
+        return;
       });
-    this.$refs["scrollable"].scrollIntoView({ behavior: "smooth" });
+    }
     return;
   },
 
@@ -207,13 +194,6 @@ export default {
       this.photo = null;
       this.$refs["scrollable"].scrollIntoView({ behavior: "smooth" });
     },
-
-    login() {
-      const auth = getAuth();
-      signInAnonymously(auth).then(() => {
-        console.log("Signed in..");
-      });
-    }
   }
 };
 </script>

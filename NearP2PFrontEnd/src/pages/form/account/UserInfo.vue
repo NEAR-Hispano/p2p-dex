@@ -3,7 +3,7 @@
     <a-drawer
       width="auto"
       placement="right"
-      bodyStyle="max-width:750px"
+      :bodyStyle="{ maxWidth: '750px' }"
       :closable="true"
       :visible="visible"
       @close="onClose"

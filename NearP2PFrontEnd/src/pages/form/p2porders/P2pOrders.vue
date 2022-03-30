@@ -6,7 +6,7 @@
       </div>
     </div>
     <template slot="extra">
-      <head-info class="split-right" :title="$t('ranking')" content="90%" />
+      <head-info class="split-right" :title="$t('ranking')" :content="percentage_complete || '0%'" />
     </template>
     <div>
       <a-card :title="title" class="card" style="width:94%; margin-left:3%">
@@ -128,6 +128,8 @@ export default {
         }
       ],
       data: [],
+      listMechants: [],
+      percentage_complete: "0",
       listFiats: [],
       databuy: [],
       typeoffer: "sell",
@@ -159,7 +161,7 @@ export default {
       const wallet = new WalletConnection(near);
       // console.log(near);
       const contract = new Contract(wallet.account(), CONTRACT_NAME, {
-        viewMethods: ["get_order_sell", "get_order_buy", "get_fiat_method"],
+        viewMethods: ["get_order_sell", "get_order_buy", "get_fiat_method", "get_merchant"],
         changeMethods: [],
         sender: wallet.account()
       });
@@ -171,6 +173,10 @@ export default {
         this.databuy = await contract.get_order_buy({
           signer_id: this.userInfo,
         });
+        this.listMechants = await contract.get_merchant({
+            user_id: this.userInfo,
+        });
+        this.percentage_complete = this.listMechants[0].percentage_complete;
       }
       this.loading = false;
     },
