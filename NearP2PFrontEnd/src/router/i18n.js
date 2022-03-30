@@ -13,7 +13,7 @@ module.exports = {
         name: "Trade",
         p2p: { name: "P2P" },
         p2pdetail: { name: "Detalle de ordenes" },
-        offer: { name: "Ofertar" },
+        offer: { name: "Colocar Oferta" },
         merchant: { name: "Administradr para mercantes" },
       },
       account: {
@@ -37,7 +37,7 @@ module.exports = {
         name: "Trade",
         p2p: { name: "P2P" },
         p2pdetail: { name: "Order details" },
-        offer: { name: "Place an offer" },
+        offer: { name: "Place Offer" },
         merchant: { name: "Admin place for Merchants" },
       },
       account: {

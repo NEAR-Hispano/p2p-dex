@@ -13,8 +13,8 @@ module.exports = {
       state: 'Estatus',
       order_amount: 'Monto de la orden',
       cancel: 'Cancelar',
-      mediation: 'Mediar',
-      aprove: 'Aprobar',
+      mediation: 'Ir a Mediación',
+      aprove: 'Aprobar Transacción',
       minutes: 'Minutos',
       status0: 'Pendiente aprobar',
       status1: 'Aprobado ofertante',
@@ -22,6 +22,7 @@ module.exports = {
       progress: 'Progreso',
       enter_message: 'Ingrese el mensaje',
       chat_text: 'ATENCION! NO libere las criptomonedas antes de confirmar si el dinero llegó a su cuenta de pago (balance disponible).',
+      timer: 'Con el tiempo vencido pasa automáticamente a mediación',
     },
     US: {
       merchant: 'Merchant',
@@ -36,8 +37,8 @@ module.exports = {
       state: 'State',
       order_amount: 'Order amount',
       cancel: 'Cancel',
-      mediation: 'Mediation',
-      aprove: 'Aprove',
+      mediation: 'Go to Mediation',
+      aprove: 'Aprove Trade',
       minutes: 'Minutes',
       status0: 'Pending approval',
       status1: 'Aproved bidder',
@@ -45,6 +46,7 @@ module.exports = {
       progress: 'Progress',
       enter_message: 'Enter your message',
       chat_text: 'ATTENTION! DO NOT release cryptocurrencies before confirming if the money reached your payment account (available balance).',
+      timer: 'With time expired automatically goes to mediation',
     }
   }
 }

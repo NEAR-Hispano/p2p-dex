@@ -12,7 +12,7 @@
         :title="$t('project')"
         :content="active_orders"
       />
-      <head-info class="split-right" :title="$t('ranking')" content="90%" />
+      <head-info class="split-right" :title="$t('ranking')" :content="percentage_complete || '0%'" />
     </template>
     <div>
       <a-card :title="title" class="card" style="width:94%; margin-left:3%">
@@ -145,6 +145,8 @@ export default {
       orderssell: [],
       ordersbuy: [],
       active_orders: "0",
+      listMechants: [],
+      percentage_complete: "0",
       checked: true,
       merchantad: this.$t("merchantad"),
       buy: this.$t("buy"),
@@ -257,6 +259,11 @@ export default {
         this.ordersbuy = await contract.get_order_buy({
             signer_id: this.userInfo,
         });
+
+        this.listMechants = await contract.get_merchant({
+            user_id: this.userInfo,
+        });
+        this.percentage_complete = this.listMechants[0].percentage_complete;
 
         this.active_orders = parseInt(this.orderssell.length) + parseInt(this.ordersbuy.length);
       }

@@ -11,7 +11,7 @@
         :title="$t('project')"
         :content="active_orders"
       />
-      <head-info class="split-right" :title="$t('ranking')" content="90%" />
+      <head-info class="split-right" :title="$t('ranking')" :content="percentage_complete || '0%'" />
     </template>
     <div>
       <a-card :title="title" class="card" style="width:94%; margin-left:3%">
@@ -33,59 +33,47 @@
           <a-col :xxl="24" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
             <a-tabs default-active-key="1" @change="callback">
               <a-tab-pane key="buy" :tab="buy">
+                <a-form-item :label="$t('status')">
+                  <a-select
+                    show-search
+                    :placeholder="select"
+                    option-filter-prop="children"
+                    @change="handleChangeFilter"
+                    class="select-responsive-lg select-responsive-md select-responsive-sm select-responsive-xs"
+                    v-decorator="[
+                      'value',
+                      {
+                        rules: [
+                          { required: true, message: $t('requiredfield') }
+                        ]
+                      }
+                    ]"
+                  >
+                    <a-select-option value="1">
+                      {{ $t("open") }}
+                    </a-select-option>
+                    <a-select-option value="2">
+                      {{ $t("close") }}
+                    </a-select-option>
+                    <a-select-option value="3">
+                      {{ $t("ondiput") }}
+                    </a-select-option>
+                    <a-select-option value="4">
+                      {{ $t("canceled") }}
+                    </a-select-option>
+                  </a-select>
+                </a-form-item>
                 <a-table
                   :columns="columns"
                   :data-source="databuy"
                   :loading="loading"
                 >
-                  <span slot="action" slot-scope="record">
-                <a @click="edit(record.payment_method_id)">
-                  <a-tooltip placement="top">
-                    <template slot="title">
-                      <span>{{ $t("edit") }}</span>
-                    </template>
-                    <a-icon
-                      type="edit"
-                      theme="twoTone"
-                      two-tone-color="#52c41a"
-                    />
-                  </a-tooltip>
-                </a>
-                <a-popconfirm
-                  placement="top"
-                  :ok-text="yes"
-                  :cancel-text="no"
-                  @confirm="
-                    delete_payment_method_user(record.payment_method_id)
-                  "
-                >
-                  <template slot="title">
-                    <p>{{ $t("messagedelete") }}</p>
+                  <template slot="status" slot-scope="text, record">
+                    <span>{{ statusOrder(record.status) }}</span>
                   </template>
-                  <a style="margin-left:10px">
-                    <a-tooltip placement="top">
-                      <template slot="title">
-                        <span>{{ $t("delete") }}</span>
-                      </template>
-                      <a-icon
-                        type="delete"
-                        theme="twoTone"
-                        two-tone-color="#f5222f"
-                      />
-                    </a-tooltip>
-                  </a>
-                </a-popconfirm>
-              </span>
-                </a-table>
-              </a-tab-pane>
-              <a-tab-pane key="sell" :tab="sell">
-                <a-table
-                  :columns="columns"
-                  :data-source="data"
-                  :loading="loading"
-                >
+
                   <span slot="action" slot-scope="record">
-                    <a @click="edit(record.payment_method_id)">
+                    <a @click="edit(record.offer_id)">
                       <a-tooltip placement="top">
                         <template slot="title">
                           <span>{{ $t("edit") }}</span>
@@ -102,7 +90,87 @@
                       :ok-text="yes"
                       :cancel-text="no"
                       @confirm="
-                        delete_payment_method_user(record.payment_method_id)
+                        delete_offer(record.offer_id)
+                      "
+                    >
+                      <template slot="title">
+                        <p>{{ $t("messagedelete") }}</p>
+                      </template>
+                      <a style="margin-left:10px">
+                        <a-tooltip placement="top">
+                          <template slot="title">
+                            <span>{{ $t("delete") }}</span>
+                          </template>
+                          <a-icon
+                            type="delete"
+                            theme="twoTone"
+                            two-tone-color="#f5222f"
+                          />
+                        </a-tooltip>
+                      </a>
+                    </a-popconfirm>
+                  </span>
+                </a-table>
+              </a-tab-pane>
+              <a-tab-pane key="sell" :tab="sell">
+                <a-form-item :label="$t('status')">
+                  <a-select
+                    show-search
+                    :placeholder="select"
+                    option-filter-prop="children"
+                    @change="handleChangeFilter"
+                    class="select-responsive-lg select-responsive-md select-responsive-sm select-responsive-xs"
+                    v-decorator="[
+                      'value',
+                      {
+                        rules: [
+                          { required: true, message: $t('requiredfield') }
+                        ]
+                      }
+                    ]"
+                  >
+                    <a-select-option value="1">
+                      {{ $t("open") }}
+                    </a-select-option>
+                    <a-select-option value="2">
+                      {{ $t("close") }}
+                    </a-select-option>
+                    <a-select-option value="3">
+                      {{ $t("ondiput") }}
+                    </a-select-option>
+                    <a-select-option value="4">
+                      {{ $t("canceled") }}
+                    </a-select-option>
+                  </a-select>
+                </a-form-item>
+                <a-table
+                  :columns="columns"
+                  :data-source="data"
+                  :loading="loading"
+                >
+                  <template slot="status" slot-scope="text, record">
+                    <span>{{ statusOrder(record.status) }}</span>
+                  </template>
+
+                  <span slot="action" slot-scope="record">
+                    <a @click="edit(record.offer_id)">
+                      <a-tooltip placement="top">
+                        <template slot="title">
+                          <span>{{ $t("edit") }}</span>
+                        </template>
+                        <a-icon
+                          type="edit"
+                          theme="twoTone"
+                          two-tone-color="#52c41a"
+                        />
+                      </a-tooltip>
+                    </a>
+                    <a-popconfirm
+                      placement="top"
+                      :ok-text="yes"
+                      :cancel-text="no"
+                      @confirm="
+                        delete_offer(record.offer_id)
                       "
                     >
                       <template slot="title">
@@ -133,7 +201,7 @@
       width="auto"
       :title="drawertittle"
       placement="right"
-      bodyStyle="max-width:750px"
+      :bodyStyle="{ maxWidth: '750px' }"
       :closable="true"
       :visible="visible"
       @close="onClose"
@@ -161,10 +229,10 @@
                   }
                 ]"
               >
-                <a-select-option value="1">
+                <a-select-option value="buy">
                   {{ $t("ordersBuy") }}
                 </a-select-option>
-                <a-select-option value="2">
+                <a-select-option value="sell">
                   {{ $t("ordersSell") }}
                 </a-select-option>
               </a-select>
@@ -178,7 +246,7 @@
                 option-filter-prop="children"
                 style="width: 90%;margin-top: 5px"
                 v-decorator="[
-                  'payment_method_id',
+                  'asset',
                   {
                     rules: [{ required: true, message: $t('requiredfield') }]
                   }
@@ -207,7 +275,7 @@
             </a-form-item>
           </a-col>
           <a-col :xxl="24" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
-            <a-form-item :label="$t('amount')" style="margin-top:5px">
+            <a-form-item :label="amount" style="margin-top:5px">
               <a-input-number
                 v-decorator="[
                   'amount',
@@ -215,7 +283,7 @@
                     rules: [{ required: true, message: $t('requiredfield') }]
                   }
                 ]"
-                :placeholder="$t('amount')"
+                :placeholder="amount"
                 style="width: 90%"
               />
             </a-form-item>
@@ -256,6 +324,7 @@
             <a-form-item :label="$t('allpayments')" style="margin-top:5px">
               <a-select
                 show-search
+                mode="multiple"
                 :placeholder="allpayments"
                 option-filter-prop="children"
                 style="width: 90%;margin-top: 5px"
@@ -378,7 +447,7 @@ export default {
     },
     computedClass() {
       let className = "button-near-sell";
-      if (this.typeoffer == "sell") {
+      if (this.opc == "sell") {
         className = "button-near-sell";
       } else {
         className = "button-near-buy";
@@ -406,6 +475,11 @@ export default {
           key: "remaining_amount"
         },
         {
+          title: this.$t("exchange_rate"),
+          dataIndex: "exchange_rate",
+          key: "exchange_rate"
+        },
+        {
           title: this.$t("status"),
           dataIndex: "status",
           key: "status",
@@ -418,16 +492,23 @@ export default {
         }
       ],
       data: [],
+      editform: [],
+      listMechants: [],
+      percentage_complete: "0",
+      status: 1,
+      update: false,
       listFiats: [],
       databuy: [],
-      typeoffer: "sell",
+      opc: "buy",
       listPayments: [],
       loading: false,
       orderssell: [],
       ordersbuy: [],
-      opc: "",
       active_orders: "0",
+      formvalue: "",
       title: this.$t("title"),
+      amount: this.$t('amount'),
+      updateid: "",
       buttonText: this.$t("action"),
       sell: this.$t("ordersSell"),
       buy: this.$t("ordersBuy"),
@@ -443,8 +524,12 @@ export default {
   },
   mounted() {
     this.fetch();
-    if (localStorage.getItem("userlength") == 0) {
-      this.$router.push("/account/myaccount");
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+
+    if (urlParams.get('transactionHashes') !== null) {
+      this.success(process.env.VUE_APP_API_BASE_URL_EXPLORER + urlParams.get('transactionHashes'));
+      window.history.pushState({}, document.title, "/nearp2p/#/trade/offer");
     }
   },
   methods: {
@@ -467,7 +552,8 @@ export default {
           "get_fiat_method",
           "get_payment_method",
           "get_offers_sell",
-          "get_offers_buy"
+          "get_offers_buy",
+          "get_merchant"
         ],
         changeMethods: [],
         sender: wallet.account()
@@ -476,10 +562,12 @@ export default {
         this.listFiats = await contract.get_fiat_method();
         this.listPayments = await contract.get_payment_method();
         this.data = await contract.get_offers_buy({
-          owner_id: this.userInfo
+          owner_id: this.userInfo,
+          status: parseInt(this.status)
         });
         this.databuy = await contract.get_offers_sell({
-          owner_id: this.userInfo
+          owner_id: this.userInfo,
+          status: parseInt(this.status)
         });
 
         this.orderssell = await contract.get_order_sell({
@@ -490,16 +578,21 @@ export default {
         });
         this.active_orders =
           parseInt(this.orderssell.length) + parseInt(this.ordersbuy.length);
+          
+        this.listMechants = await contract.get_merchant({
+            user_id: this.userInfo,
+        });
+        this.percentage_complete = this.listMechants[0].percentage_complete;  
       }
       this.loading = false;
     },
     callback(key) {
-      this.typeoffer = key;
+      this.opc = key;
     },
     detail(record) {
       this.$router.push({
         path: "/d/trade/detail",
-        query: { order: record, type: this.typeoffer }
+        query: { order: record, type: this.opc }
       });
     },
     getFiat(value) {
@@ -507,6 +600,12 @@ export default {
       return this.listFiats
         .filter(fiat => fiat.id == value)[0]
         .fiat_method.split(" - ")[0];
+    },
+    getPaymentDescription(value) {
+      // console.log(this.listFiats.filter(fiat => fiat.id == value)[0].fiat_method.split(" - ")[0]);
+      return this.listPayments
+        .filter(pay => pay.id == value)[0]
+        .payment_method;
     },
     filterOption(input, option) {
       return (
@@ -526,15 +625,23 @@ export default {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
-          //console.log("Received values of form: ", values);
-          this.set_payment_method_user(
-            values.payment_method_id,
-            values.input1,
-            values.input2,
-            values.input3,
-            values.input4,
-            values.input5,
-            "1"
+          let jsonArr = [];
+          let input = values.payment_method
+          for (let i = 0; i < input.length; i++) {
+            jsonArr.push({"id":input[i],"payment_method":this.getPaymentDescription(input[i])});
+            //console.log(input[i])
+          }
+          
+          this.set_offer(
+            values.asset,
+            values.exchange_rate,
+            values.amount,
+            values.min_limit,
+            values.max_limit,
+            jsonArr,
+            values.fiat_method,
+            values.time,
+            values.terms_conditions,
           );
         }
       });
@@ -551,6 +658,7 @@ export default {
       terms_conditions
     ) {
       this.$message.success(this.$t("pc"));
+      this.amount = this.$t('amount');
       //this.loading = true;
       // connect to NEAR
       const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME;
@@ -562,56 +670,236 @@ export default {
       const wallet = new WalletConnection(near);
       // console.log(near);
       const contract = new Contract(wallet.account(), CONTRACT_NAME, {
-        changeMethods: ["set_offers_sell", "set_offers_buy"],
+        changeMethods: ["set_offers_sell", "set_offers_buy", "put_offers_sell", "put_offers_buy"],
         sender: wallet.account()
       });
       if (wallet.isSignedIn()) {
-        if (this.opc == "1") {
+        if (this.opc == "buy" && this.update == false) {         
           await contract.set_offers_sell(
             {
               owner_id: this.userInfo,
-              asset: asset,
-              exchange_rate: exchange_rate,
-              amount: amount,
-              min_limit: min_limit,
-              max_limit: max_limit,
-              payment_method: payment_method,
-              fiat_method: fiat_method,
-              time: time,
-              terms_conditions: terms_conditions
+              asset: asset.toString(),
+              exchange_rate: exchange_rate.toString(),
+              amount: parseFloat(amount),
+              min_limit: parseFloat(min_limit),
+              max_limit: parseFloat(max_limit),
+              payment_method: eval(payment_method),
+              fiat_method: parseInt(fiat_method),
+              time: parseFloat(time),
+              terms_conditions: terms_conditions.toString()
             },
             "300000000000000", // attached GAS (optional)
             "1" // attached deposit in yoctoNEAR (optional)
           );
-        } else {
+        } else if (this.opc == "sell" && this.update == false) { 
           await contract.set_offers_buy(
             {
               owner_id: this.userInfo,
-              asset: asset,
-              exchange_rate: exchange_rate,
-              amount: amount,
-              min_limit: min_limit,
-              max_limit: max_limit,
-              payment_method: payment_method,
-              fiat_method: fiat_method,
-              time: time,
-              terms_conditions: terms_conditions
+              asset: asset.toString(),
+              exchange_rate: exchange_rate.toString(),
+              amount: parseFloat(amount),
+              min_limit: parseFloat(min_limit),
+              max_limit: parseFloat(max_limit),
+              payment_method: eval(payment_method),
+              fiat_method: parseInt(fiat_method),
+              time: parseFloat(time),
+              terms_conditions: terms_conditions.toString()
+            },
+            "300000000000000", // attached GAS (optional)
+            "1" // attached deposit in yoctoNEAR (optional)
+          );
+        } else if (this.opc == "buy" && this.update == true) {  
+          await contract.put_offers_sell(
+            {
+              offer_id: this.updateid,
+              asset: asset.toString(),
+              exchange_rate: exchange_rate.toString(),
+              remaining_amount: parseFloat(amount),
+              min_limit: parseFloat(min_limit),
+              max_limit: parseFloat(max_limit),
+              payment_method: eval(payment_method),
+              fiat_method: parseInt(fiat_method),
+              time: parseFloat(time),
+              terms_conditions: terms_conditions.toString()
+            },
+            "300000000000000", // attached GAS (optional)
+            "1" // attached deposit in yoctoNEAR (optional)
+          );
+        } else if (this.opc == "sell" && this.update == true) {  
+          await contract.put_offers_buy(
+            {
+              offer_id: this.updateid,
+              asset: asset.toString(),
+              exchange_rate: exchange_rate.toString(),
+              remaining_amount: parseFloat(amount),
+              min_limit: parseFloat(min_limit),
+              max_limit: parseFloat(max_limit),
+              payment_method: eval(payment_method),
+              fiat_method: parseInt(fiat_method),
+              time: parseFloat(time),
+              terms_conditions: terms_conditions.toString()
             },
             "300000000000000", // attached GAS (optional)
             "1" // attached deposit in yoctoNEAR (optional)
           );
         }
       }
+      this.opc = "buy";
+    },
+    async delete_offer(
+      offer_id
+    ) {
+      this.$message.success(this.$t("pc"));
+      //this.loading = true;
+      // connect to NEAR
+      const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME;
+      const near = await connect(
+        CONFIG(new keyStores.BrowserLocalStorageKeyStore())
+      );
+      // create wallet connection
+      // const account = await near.account();
+      const wallet = new WalletConnection(near);
+      // console.log(near);
+      const contract = new Contract(wallet.account(), CONTRACT_NAME, {
+        changeMethods: ["delete_offers_sell", "delete_offers_buy"],
+        sender: wallet.account()
+      });
+      if (wallet.isSignedIn()) {
+        if (this.opc == "buy") {         
+          await contract.delete_offers_sell(
+            {
+              offer_id: parseInt(offer_id),
+            },
+          );
+        } else {
+          await contract.delete_offers_buy(
+            {
+              offer_id: parseInt(offer_id),
+            },
+          );
+        }
+        this.fetch();
+      }
+    },
+    async edit(id) {
+      this.amount = this.$t('remaining_amount'),
+      this.update = true;
+      this.updateid = id;
+      const { connect, keyStores, WalletConnection, Contract } = nearAPI;
+      // connect to NEAR
+      const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME;
+      const near = await connect(
+        CONFIG(new keyStores.BrowserLocalStorageKeyStore())
+      );
+      // create wallet connection
+      // const account = await near.account();
+      const wallet = new WalletConnection(near);
+      // console.log(near);
+      const contract = new Contract(wallet.account(), CONTRACT_NAME, {
+        viewMethods: ["get_offers_sell", "get_offers_buy"],
+        changeMethods: [],
+        sender: wallet.account()
+      });
+      if (wallet.isSignedIn()) {
+        if (this.opc == "buy") {     
+        this.formvalue = "buy";
+        this.editform = await contract.get_offers_sell({
+          offer_id: parseInt(id)
+        });
+        } else {
+          this.formvalue = "sell";
+          this.editform = await contract.get_offers_buy({
+            offer_id: parseInt(id)
+          });
+        }
+        if (this.editform.length > 0) {
+          this.visible = true;
+          var obj = this.editform[0].payment_method;
+          
+          const keys = Object.keys(obj);
+          const res = [];
+          for(let i = 0; i < keys.length; i++){
+              res.push(obj[keys[i]].id);
+          }
+          
+          this.form.setFieldsValue({
+            value: this.formvalue,
+            asset: this.editform[0].asset,
+            exchange_rate: this.editform[0].exchange_rate,
+            amount: this.editform[0].remaining_amount,
+            min_limit: this.editform[0].min_limit,
+            max_limit: this.editform[0].max_limit,
+            payment_method: res,
+            fiat_method: this.editform[0].fiat_method,
+            time: this.editform[0].time,
+            terms_conditions: this.editform[0].terms_conditions,
+          });
+          this.$forceUpdate();
+          setTimeout(() => {
+            this.form.setFieldsValue({
+            value: this.formvalue,
+            asset: this.editform[0].asset,
+            exchange_rate: this.editform[0].exchange_rate,
+            amount: this.editform[0].remaining_amount,
+            min_limit: this.editform[0].min_limit,
+            max_limit: this.editform[0].max_limit,
+            payment_method: res,
+            fiat_method: this.editform[0].fiat_method,
+            time: this.editform[0].time,
+            terms_conditions: this.editform[0].terms_conditions,
+            });
+          }, 300);
+          this.$forceUpdate();
+        }
+      }
     },
     handleChange(value) {
       this.opc = value;
+    },
+    handleChangeFilter(value) {
+      this.status = value;
+      this.fetch();
     },
     showDrawer() {
       this.visible = true;
     },
     onClose() {
       this.visible = false;
-    }
+    },
+    statusOrder(val) {
+      //console.log(val);
+      switch (val) {
+        case "1":
+          return this.$t("Open");
+        case "2":
+          return this.$t("closed");
+        case "3":
+          return this.$t("ondiput");
+        case "4":
+          return this.$t("canceled");
+        default:
+          return this.$t("Open");
+      }
+    },
+    success(url) {
+      //console.log(url);
+      this.url = url;
+      this.message = this.$t("explorer");
+      //var dir = process.env.NEAR_EXPLORER + url
+      this.$success({
+        title: 'LOG',
+        // JSX support
+        content: (
+          <div>
+            <p>
+              <a href={this.url} target="_blank">
+                {this.message}
+              </a>
+            </p>
+          </div>
+        ),
+      });
+    },
   }
 };
 </script>

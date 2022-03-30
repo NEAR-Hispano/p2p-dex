@@ -83,7 +83,7 @@
     <a-drawer
       width="auto"
       :title="drawertittle"
-      bodyStyle="max-width:750px"
+      :bodyStyle="{ maxWidth: '750px' }"
       placement="right"
       :closable="true"
       :visible="visible"
@@ -256,7 +256,7 @@
                       :sm="24"
                       :xs="24"
                     >
-                      <a-button block>{{ $t("method") }}</a-button>
+                      <a-button block @click="payment">{{ $t("method") }}</a-button>
                     </a-col>
                     <a-col
                       :xxl="24"
@@ -823,6 +823,9 @@ export default {
       return this.listFiats
         .filter(fiat => fiat.id == value)[0]
         .fiat_method.split(" - ")[0];
+    },
+    payment(){
+      this.$router.push({ path: "/account/bank" });
     }
   }
 };
