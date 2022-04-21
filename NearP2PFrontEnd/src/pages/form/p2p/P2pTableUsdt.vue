@@ -464,7 +464,7 @@ export default {
       current: 0,
       form: this.$form.createForm(this),
       all: 0,
-      fee: 0.003,
+      fee: 0.004,
       price: 0,
       min: 0,
       max: 0,
@@ -640,7 +640,7 @@ export default {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
-          console.log(values);
+          //console.log(values);
           this.current++;
         }
       });

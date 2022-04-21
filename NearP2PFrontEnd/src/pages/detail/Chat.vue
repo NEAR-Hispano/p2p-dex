@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <header>
-      <h1 style="color: white">Chat</h1>
+      <h1 style="color: white">{{ this.$t("chat_text") }}</h1>
       <div v-if="imageData != null">
         <img class="img.preview" :src="picture" />
         <br />
@@ -30,7 +30,6 @@
       <form @submit="sendMessage">
         <input
           v-model="message"
-          autofocus
           ref="input"
           type="text"
           :placeholder="tmessage"
@@ -45,10 +44,8 @@
 
         <button
           @click="$refs.file.click()"
-          :disabled="isLoading"
           type="button"
           class="button"
-          :class="{ 'is-loading': isLoading }"
         >
           <a-icon type="cloud-upload" />
         </button>
@@ -88,50 +85,47 @@ export default {
       photos: [],
       photo: null,
       //fileURL: null,
-      isloading: false,
+      //isloading: false,
       uploadValue: 0,
       imageData: null,
       room: "room" + this.$route.query.order
       //picture: 'url',
     };
   },
-  async mounted() {
-    // RUTINA PARA CREAR LA SALA DE CHAT
-    const room1Ref = db.collection(this.room);
-    const snapshot = await room1Ref.where("displayName", "==", "NEAR").get();
-    console.log(snapshot);
-    if (!snapshot.empty) {
-      const auth = getAuth();
-      signInAnonymously(auth).then(() => {
-        this.user = auth.currentUser;
-        const messageInfo = {
-          userUID: this.user.uid,
-          displayName: "NEAR",
-          text: this.$t("chat_text"),
-          created: 0
-        };
-        console.log(messageInfo);
-        console.log(this.room);
-        db.collection(this.room).add(messageInfo);
-        db.collection(this.room)
-          .orderBy("created")
-          .onSnapshot(querySnap => {
-            this.messages = querySnap.docs.map(doc => doc.data());
-          });
-        this.$refs["scrollable"].scrollIntoView({ behavior: "smooth" });
-        return;
-      });
-    }
-    return;
-  },
-
   computed: {
     messagePhoto() {
       return URL.createObjectURL(this.photo);
     },
     ...mapGetters("account", ["userInfo"])
   },
+  async mounted() {
+    // RUTINA PARA CREAR LA SALA DE CHAT
+    const room1Ref = db.collection(this.room);
+    const snapshot = await room1Ref.where("displayName", "==", "NEAR");
+    if (!snapshot.empty) {     
+      const auth = getAuth();
+      signInAnonymously(auth).then(() => {
+        this.user = auth.currentUser;
+        /*
+        const messageInfo = {
+          userUID: this.user.uid,
+          displayName: "NEAR",
+          //text: this.$t("helloFrom") + " " + this.userInfo,
+          created: 0
+        };*/
+        db.collection(this.room)
+          .orderBy("created")
+          .onSnapshot(querySnap => {
+            this.messages = querySnap.docs.map(doc => doc.data());
+          });
+        this.$refs["scrollable"].scrollIntoView({ behavior: "smooth", block: "end" });
 
+        return;
+      });
+      
+    }
+    return;
+  },
   methods: {
     onFileChange(event) {
       this.photo = event.target.files[0];
@@ -171,6 +165,7 @@ export default {
       } else {
         const messageInfo = {
           userUID: this.user.uid,
+          displayName: this.userInfo,
           photoURL: null,
           text: this.message,
           created: Date.now(),
@@ -184,6 +179,7 @@ export default {
     async Grabar() {
       const messageInfo = {
         userUID: this.user.uid,
+        displayName: this.userInfo,
         photoURL: this.picture,
         text: this.message,
         created: Date.now(),

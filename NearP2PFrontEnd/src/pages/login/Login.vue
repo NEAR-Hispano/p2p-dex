@@ -74,12 +74,19 @@ export default {
       const near = await connect(CONFIG(new keyStores.BrowserLocalStorageKeyStore()));
       //const BASE_URL = process.env.VUE_APP_API_BASE_URL
       // create wallet connection
+       const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME;
       const wallet = new WalletConnection(near);
       wallet.requestSignIn(
-        "p2p.info.testnet", // contract requesting access
+        CONTRACT_NAME, // contract requesting access
         "NEAR P2P", // optional
-        "http://localhost:8080/nearp2p/#/redirect", // optional
-        "http://localhost:8080/nearp2p/403" // optional
+        "http://localhost:8080/#/redirect", // optional
+        "http://localhost:8080/403" // optional
+        //"https://nearp2p.com/#/redirect", // optional
+        //"https://nearp2p.com/403" // optional,
+        //"https://testnet.nearp2p.com/#/redirect", // optional
+        //"https://testnet.nearp2p.com/403" // optional,
+        //"https://app.nearp2p.com/#/redirect", // optional
+        //"https://app.nearp2p.com/403" // optional,
       );
     },
   }

@@ -2,7 +2,9 @@
 // const API_PROXY_PREFIX='/api'
 //const BASE_URL = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_API_BASE_URL : API_PROXY_PREFIX
 const BASE_URL = process.env.VUE_APP_API_BASE_URL
+const BASE_URL_MAIL = process.env.VUE_APP_API_MAIL_URL
 const NETWORK = process.env.NODE_ENV === 'development' ? 'testnet' : 'testnet'
+
 
 function CONFIG(keyStores) {
   switch (NETWORK) {
@@ -35,5 +37,8 @@ module.exports = {
   GOODS: `${BASE_URL}/goods`,
   GOODS_COLUMNS: `${BASE_URL}/columns`,
   BINANCE_NEAR: `https://api.binance.com/api/v3/ticker/24hr?symbol=NEARUSDT`,
+  MAIL: `${BASE_URL_MAIL}admin@nearp2p.com/`,
+  MAILCANCEL: `${BASE_URL_MAIL}cancel/admin@nearp2p.com/`,
+  MAILDISPUTE: `${BASE_URL_MAIL}dispute/admin@nearp2p.com/`,
   CONFIG,
 }

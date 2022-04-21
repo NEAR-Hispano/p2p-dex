@@ -45,7 +45,7 @@ module.exports = {
       accountData: 'Account data',
       requiredfield: 'Required field',
       profile: 'View payments methods',
-      allpayments: 'Select paymenth method',
+      allpayments: 'Select payment method',
       pc : 'Processing complete!',
       ranking: 'Ranking',
       explorer: 'Check transaction in explorer',

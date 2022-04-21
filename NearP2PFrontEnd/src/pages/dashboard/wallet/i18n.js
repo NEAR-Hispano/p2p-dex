@@ -16,6 +16,7 @@ module.exports = {
       messagelast: 'Última visita',
       near: 'NEAR',
       tether: 'Tether USD',
+      detail: 'Detalle de la cuenta',
     },
     US: {
       project: 'Pending orders P2P',
@@ -33,6 +34,7 @@ module.exports = {
       messagelast: 'Last seen',
       near: 'NEAR',
       tether: 'Tether USD',
+      detail: 'Detail Account',
     },
   }
 }

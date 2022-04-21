@@ -14,6 +14,9 @@ module.exports = {
       ordersBuy: 'Ordenes de compra',
       exchange_rate: 'Tasa de cambio',
       fiat: 'Fiat',
+      warning: 'Advertencia',
+      dispute: 'Esta es una advertencia por Ud. tiene orden en disputa.',
+      amountd: 'Monto deducido'
     },
     US: {
       pageDesc: 'You can check pending sell and buy orders.',
@@ -29,6 +32,9 @@ module.exports = {
       ordersBuy: 'Buy orders',
       exchange_rate: 'Exchange rate',
       fiat: 'Fiat',
+      warning: 'Warning',
+      dispute: "This is warning because you haver order's in dispute.",
+      amountd: 'Amount Deducted'
     }
   }
 }

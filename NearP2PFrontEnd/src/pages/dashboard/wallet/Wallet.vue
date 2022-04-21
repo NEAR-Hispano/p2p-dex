@@ -21,7 +21,7 @@
               style="fontSize: 16px;color: rgba(0, 0, 0, 0.85); marginBottom: 16px;fontWeight: bold"
             >
               <a-icon type="user" />
-              Detail Account
+              {{ $t('detail') }}
             </p>
             <a-row type="flex" style="margin-top: 25px;">
               <a-col :xxl="14" :xl="14" :lg="14" :md="14" :sm="14" :xs="24">
@@ -44,9 +44,9 @@
               </a-col>
               <a-col :xxl="10" :xl="10" :lg="10" :md="10" :sm="10" :xs="24">
                 <p class="balance">
-                  ≈ $ {{ balanceDollar | numericFormat(numericFormatConfig) }}
+                  ≈ $ {{ balanceDollar  | numericFormat(numericFormatConfig)}}
                 </p>
-                <p class="balance-near">{{ balance }} NEAR</p>
+                <p class="balance-near">{{ balance | numericFormat(numericFormatConfigNear)}} NEAR</p>
                 <p class="balance-near">
                   $
                   {{ lastPrice.lastPrice | numericFormat(numericFormatConfig) }}
@@ -155,7 +155,14 @@ export default {
       balanceDollar: "",
       numericFormatConfig: {
         decimalSeparator: ".",
-        fractionDigitsMax: 2,
+        fractionDigitsMax: 3,
+        fractionDigitsMin: 2,
+        fractionDigitsSeparator: "",
+        thousandsDigitsSeparator: ","
+      },
+      numericFormatConfigNear: {
+        decimalSeparator: ".",
+        fractionDigitsMax: 5,
         fractionDigitsMin: 2,
         fractionDigitsSeparator: "",
         thousandsDigitsSeparator: ","
@@ -192,11 +199,22 @@ export default {
       this.$t("message6")
     ];
     this.welcome.message = message[Math.floor(Math.random() * message.length)];
-    this.fetch();
-    setTimeout(this.fetch(), 1000);
-    //setTimeout(this.fetch(), 1000);
     this.getBalance();
+    setTimeout(this.getBalance(), 1000);
+    setTimeout(this.getBalance(), 1500);
     this.getBalanceTether();
+    this.pollData();
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+
+    if (urlParams.get("order") !== null) {
+      window.history.pushState(
+        {},
+        document.title,
+        "/#/dashboard/wallet"
+      );
+    }
   },
   methods: {
     fetch() {
@@ -208,6 +226,7 @@ export default {
       };
     },
     async getBalance() {
+      this.fetch();
       // connect to NEAR
       //console.log(new keyStores.BrowserLocalStorageKeyStore())
       const near = await connect(
@@ -223,21 +242,23 @@ export default {
         sender: wallet.account()
       });
       var user = [];
-      console.log(wallet.isSignedIn());
+      // console.log(wallet.isSignedIn());
       if (wallet.isSignedIn()) {
+        //console.log(wallet.isSignedIn());
         const accountId = wallet.getAccountId();
         // gets account balance
         const account = await near.account(accountId);
         const balance = await account.getAccountBalance();
         //const amountInNEAR = utils.format.formatNearAmount(balance);
         const dipo = utils.format.formatNearAmount(balance.available);
-        const restar = utils.format.formatNearAmount("50000000000000000000000");
+        //const restar = utils.format.formatNearAmount("50000000000000000000000");
         // this.balance = parseFloat(balance.total)/10**24
-        this.balance = (dipo - restar).toFixed(5);
+        this.balance = parseFloat(dipo.replace(",","")-"0.05");
+        //console.log(this.lastPrice.lastPrice)
         localStorage.setItem("wallet_balance", this.balance);
         this.balanceDollar = this.balance * this.lastPrice.lastPrice;
-        this.balanceblock = (0.25 * this.lastPrice.lastPrice).toFixed(2);
-
+        //this.balanceblock = (0.25 * this.lastPrice.lastPrice).toFixed(2);
+        // console.log(this.userInfo);
         this.orderssell = await contract.get_order_sell({
           signer_id: this.userInfo
         });
@@ -248,13 +269,14 @@ export default {
         user = await contract.get_user({
           user_id: this.userInfo
         });
+        //console.log('ffrfrf'  + user);
+        localStorage.setItem("userlength", user.length);
 
         this.listMechants = await contract.get_merchant({
             user_id: this.userInfo,
         });
-        this.percentage_complete = this.listMechants[0].percentage_complete;
+        this.percentage_complete = this.listMechants[0].percentaje_completion.toFixed(2) + '%';
 
-        localStorage.setItem("userlength", user.length);
         this.active_orders =
           parseInt(this.orderssell.length) + parseInt(this.ordersbuy.length);
 
@@ -265,7 +287,7 @@ export default {
           window.history.pushState(
             {},
             document.title,
-            "/nearp2p/#/dashboard/wallet"
+            "/#/dashboard/wallet"
           );
         }
       }
@@ -319,7 +341,7 @@ export default {
         //console.log(currentBlock)
         blockArr.push(currentBlock.header.hash);
         blockHash = currentBlock.header.prev_hash;
-        console.log(i, "working...", blockHash);
+        //console.log(i, "working...", blockHash);
       }
       // returns block details based on hashes in array
       //console.log(near)
@@ -352,8 +374,6 @@ export default {
         //method: txs.actions[0].FunctionCall.method_name,
         link: `https://explorer.testnet.near.org/transactions/${txs.hash}`
       }));
-      console.log("MATCHING TRANSACTIONS: ", transactions);
-      console.log("TRANSACTION LINKS: ", txsLinks);
       var title = "";
       if (
         transactions[0].actions[0].AddKey.access_key.permission == "FullAccess"
@@ -403,14 +423,14 @@ export default {
       console.log("Result: ", result);
     },
     async explorer() {
-      const near = await connect(
-        CONFIG(new keyStores.BrowserLocalStorageKeyStore())
-      );
-      // create wallet connection
-      const wallet = new WalletConnection(near, NOMBRE); // creamos la conexion a una wallet
-      const accountId = wallet.getAccountId();
-      window.open("https://explorer.testnet.near.org/accounts/" + accountId);
-    }
+      window.open("https://explorer.testnet.near.org/accounts/" + this.userInfo);
+    },
+    pollData() {
+      this.getBalance();
+      this.polling = setInterval(() => {
+        this.getBalance();
+      }, 15000);
+    },
   }
 };
 </script>

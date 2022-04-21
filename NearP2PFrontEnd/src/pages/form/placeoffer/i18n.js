@@ -40,6 +40,8 @@ module.exports = {
       pc : 'Proceso completado!',
       explorer: 'Verificar transacción en el explorador',
       messagedelete: 'Está seguro que desea borrar este registro?',
+      integer: 'Sólo valores enteros, máximo 1440 minutos',
+      requiredremaining: 'Requerido, cuando edite el remanent no puede ser mayor al monto',
     },
     US: {
       pageDesc: 'You can place sell and buy orders.',
@@ -68,7 +70,7 @@ module.exports = {
       fiat_method: 'Fiat method',
       time: 'Time in minutes',
       terms_conditions: 'Terms and conditions',
-      allpayments: 'Select paymenth method',
+      allpayments: 'Select payment method',
       selectfiat: 'Select fiat',
       requiredfield: 'Required field',
       save: 'Save',
@@ -82,6 +84,8 @@ module.exports = {
       pc : 'Processing complete!',
       explorer: 'Check transaction in explorer',
       messagedelete: 'Are you sure to delete this record??',
+      integer: 'Only integer values, maximun value 1440 minutes',
+      requiredremaining: 'Required, when edit the remaining amount must be less than amount',
     }
   }
 }

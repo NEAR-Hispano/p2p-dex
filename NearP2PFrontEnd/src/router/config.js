@@ -26,26 +26,6 @@ const options = {
       component: () => import('@/pages/exception/403'),
     },
     
-    /*Trade Detail*/
-    {
-      path: '/d',
-      name: 'd',
-      component: TabsView,
-      children: [
-        {
-          path: 'trade',
-          name: 'trade',
-          component: BlankView,
-          children: [
-            {
-              path: 'detail',
-              name: 'detail',
-              component: () => import('@/pages/detail/AdvancedDetail'),
-            },
-          ]
-        },
-      ]
-    },
     /*General Menu*/
     {
       path: '/',
@@ -72,6 +52,7 @@ const options = {
               },
               component: () => import('@/pages/dashboard/wallet'),
             },
+            /*
             {
               path: 'analysis',
               name: 'Analyze the page',
@@ -79,7 +60,7 @@ const options = {
                 icon: 'dashboard',
               },
               component: () => import('@/pages/dashboard/analysis'),
-            }
+            }*/
           ]
         },
         {
@@ -108,6 +89,14 @@ const options = {
                 icon: 'unordered-list',
               },
               component: () => import('@/pages/form/p2porders'),
+            },
+            {
+              path: 'tradedetail',
+              name: 'tradedetail',
+              meta: {
+                icon: 'folder-open',
+              },
+              component: () => import('@/pages/detail/AdvancedDetail'),
             },
             {
               path: 'offer',
@@ -160,7 +149,7 @@ const options = {
               meta: {
                 icon: 'unordered-list',
               },
-              component: () => import('@/pages/form/account'),
+              component: () => import('@/pages/form/history'),
             },
           ]
         },

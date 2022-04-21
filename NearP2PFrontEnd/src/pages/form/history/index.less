@@ -1,0 +1,116 @@
+/*
+Hidden Mobile
+*/
+@media (max-width: 992px) {
+  .hidden-mobile {
+    display: none;
+  }
+}
+
+.subtitle{
+  font-size: 13px;
+}
+
+
+.button-near-place{
+  background-color: rgb(39, 39, 41) !important;
+  border-color: rgb(39, 39, 41) !important;
+  margin-bottom: 10px !important;
+}
+
+.button-near-place:hover{
+  background-color: black;
+  border-color: black;
+}
+
+/*
+Used for images responsives
+*/
+@media (min-width: 1920px) and (max-width: 2560px) {
+  .image-responsive-lg{
+    width: 1850px !important;
+  }
+}
+
+@media  (min-width: 1600px) and (max-width: 1919px) {
+  .image-responsive-md{
+    width: 450px !important;
+  }
+}
+
+@media  (min-width: 1366px) and (max-width: 1599px) {
+  .image-responsive-sm{
+    width: 345px !important;
+  }
+}
+
+/*
+Used for images responsives
+*/
+@media (min-width: 1920px) and (max-width: 2560px) {
+  .select-responsive-lg{
+    width: 30% !important;
+    margin-top: 5px !important;
+  }
+}
+
+@media  (min-width: 1600px) and (max-width: 1919px) {
+  .select-responsive-md{
+    width: 30% !important;
+    margin-top: 5px !important;
+  }
+}
+
+@media  (min-width: 1366px) and (max-width: 1599px) {
+  .select-responsive-sm{
+    width: 70% !important;
+    margin-top: 5px !important;
+  }
+}
+
+@media  (max-width: 1365px) {
+  .select-responsive-xs{
+    width: 90% !important;
+    margin-top: 5px !important;
+  }
+}
+
+/* Table responsive
+*/
+.ant-table {
+  display: block;
+
+  @media screen and (max-width: 650px) {
+    &-thead {
+      display: none;
+    }
+
+    &-thead>tr,
+    &-tbody>tr {
+
+      th,
+      td {
+        &:first-of-type {
+          padding-top: 1rem;
+        }
+
+        &:last-of-type {
+          padding-bottom: 1rem;
+        }
+      }
+
+      >th,
+      >td {
+        display: block;
+        width: auto !important;
+        border: none;
+        padding: 0 1rem;
+        font-size: 1.1rem;
+
+        &:last-child {
+          border-bottom: 1px solid #eee;
+        }
+      }
+    }
+  }
+}

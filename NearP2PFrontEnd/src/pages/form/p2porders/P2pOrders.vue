@@ -6,7 +6,17 @@
       </div>
     </div>
     <template slot="extra">
-      <head-info class="split-right" :title="$t('ranking')" :content="percentage_complete || '0%'" />
+      <a-alert v-if="isdispute"
+        :message="$t('warning')"
+        :description="$t('dispute')"
+        type="warning"
+        show-icon
+      />
+      <head-info
+        class="split-right"
+        :title="$t('ranking')"
+        :content="percentage_complete || '0%'"
+      />
     </template>
     <div>
       <a-card :title="title" class="card" style="width:94%; margin-left:3%">
@@ -14,12 +24,19 @@
           <a-tab-pane key="sell" :tab="sell">
             <a-table :columns="columns" :data-source="data" :loading="loading">
               <template slot="operation_amount" slot-scope="text">
-                <span style="font-size:0.7rem; padding-left: 2px">{{
-                  text }} NEAR</span>
+                <span style="font-size:0.7rem; padding-left: 2px"
+                  >{{ text }} NEAR</span
+                >
+              </template>
+               <template slot="fee_deducted" slot-scope="text">
+                <span style="font-size:0.7rem; padding-left: 2px"
+                  >{{ text }} NEAR</span
+                >
               </template>
               <template slot="fiat_method" slot-scope="text, record">
                 <span style="font-size:0.7rem; padding-left: 2px">{{
-                  getFiat(record.fiat_method) }}</span>
+                  getFiat(record.fiat_method)
+                }}</span>
               </template>
               <template slot="action" slot-scope="text, record">
                 <a-button
@@ -34,14 +51,25 @@
             </a-table>
           </a-tab-pane>
           <a-tab-pane key="buy" :tab="buy">
-            <a-table :columns="columns" :data-source="databuy" :loading="loading">
+            <a-table
+              :columns="columns"
+              :data-source="databuy"
+              :loading="loading"
+            >
               <template slot="operation_amount" slot-scope="text">
-                <span style="font-size:0.7rem; padding-left: 2px">{{
-                  text }} NEAR</span>
+                <span style="font-size:0.7rem; padding-left: 2px"
+                  >{{ text }} NEAR</span
+                >
+              </template>
+               <template slot="fee_deducted" slot-scope="text">
+                <span style="font-size:0.7rem; padding-left: 2px"
+                  >{{ text }} NEAR</span
+                >
               </template>
               <template slot="fiat_method" slot-scope="text, record">
                 <span style="font-size:0.7rem; padding-left: 2px">{{
-                  getFiat(record.fiat_method) }}</span>
+                  getFiat(record.fiat_method)
+                }}</span>
               </template>
               <template slot="action" slot-scope="text, record">
                 <a-button
@@ -80,7 +108,7 @@ export default {
     desc() {
       return this.$t("pageDesc");
     },
-  computedClass() {
+    computedClass() {
       let className = "button-near-sell";
       if (this.typeoffer == "sell") {
         className = "button-near-sell";
@@ -106,6 +134,12 @@ export default {
           scopedSlots: { customRender: "operation_amount" }
         },
         {
+          title: this.$t("amountd"),
+          dataIndex: "fee_deducted",
+          key: "fee_deducted",
+          scopedSlots: { customRender: "fee_deducted" }
+        },
+        {
           title: this.$t("fiat"),
           dataIndex: "fiat_method",
           key: "fiat_method",
@@ -129,6 +163,7 @@ export default {
       ],
       data: [],
       listMechants: [],
+      user: [],
       percentage_complete: "0",
       listFiats: [],
       databuy: [],
@@ -138,13 +173,30 @@ export default {
       buttonText: this.$t("action"),
       sell: this.$t("ordersSell"),
       buy: this.$t("ordersBuy"),
-      dataSource
+      dataSource,
+      isdispute: false
     };
   },
   mounted() {
     this.fetch();
-    if(localStorage.getItem("userlength") == 0){
-      this.$router.push("/account/myaccount");
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+
+    if (urlParams.get("transactionHashes") !== null) {
+      this.success(
+        process.env.VUE_APP_API_BASE_URL_EXPLORER +
+          urlParams.get("transactionHashes")
+      );
+      history.replaceState(
+        null,
+        location.href.split("?")[0],
+        "/#/trade/p2pdetail"
+      );
+    }
+
+    if (urlParams.get("order") !== null) {
+      window.history.pushState({}, document.title, "/#/trade/p2pdetail");
     }
   },
   methods: {
@@ -161,23 +213,52 @@ export default {
       const wallet = new WalletConnection(near);
       // console.log(near);
       const contract = new Contract(wallet.account(), CONTRACT_NAME, {
-        viewMethods: ["get_order_sell", "get_order_buy", "get_fiat_method", "get_merchant"],
+        viewMethods: [
+          "get_order_sell",
+          "get_order_buy",
+          "get_fiat_method",
+          "get_merchant",
+          "get_user"
+        ],
         changeMethods: [],
         sender: wallet.account()
       });
       if (wallet.isSignedIn()) {
         this.listFiats = await contract.get_fiat_method();
         this.data = await contract.get_order_sell({
-         signer_id: this.userInfo,
+          signer_id: this.userInfo
         });
         this.databuy = await contract.get_order_buy({
-          signer_id: this.userInfo,
+          signer_id: this.userInfo
         });
+
+        this.user = await contract.get_user({
+          user_id: this.userInfo
+        });
+        if (this.user.length == 0) {
+          this.$router.push("/account/myaccount");
+        }
+
         this.listMechants = await contract.get_merchant({
-            user_id: this.userInfo,
+          user_id: this.userInfo
         });
-        this.percentage_complete = this.listMechants[0].percentage_complete;
+        this.percentage_complete =
+          this.listMechants[0].percentaje_completion.toFixed(2) + "%";
       }
+
+      //If there is a dispute got to detail in buy or sell
+        for(var i = 0; i < this.databuy.length; i++){
+          if(this.databuy[i].status == 3){
+            this.isdispute = true;
+          }
+        }
+ 
+        for(var x = 0; x < this.data.length; x++){
+          if(this.data[x].status == "3"){
+            this.isdispute = true;
+          }
+        }
+      ////////////////////////////////////////////////////  
       this.loading = false;
     },
     callback(key) {
@@ -185,7 +266,7 @@ export default {
     },
     detail(record) {
       this.$router.push({
-        path: "/d/trade/detail",
+        path: "/trade/tradedetail",
         query: { order: record, type: this.typeoffer }
       });
     },

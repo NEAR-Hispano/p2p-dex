@@ -12,13 +12,16 @@
           />
         </p>
         <span style="color:gray; font-size: 12px"
-          >{{ merchants[index].orders_completed }} {{ orders }} | {{ merchants[index].percentaje_completion }} % {{ completion }}</span
+          >{{ merchants[index].orders_completed }} {{ orders }} |
+          {{ merchants[index].percentaje_completion }} % {{ completion }}</span
         >
       </template>
 
       <template slot="exchange_rate" slot-scope="text, record">
         <span style="color:black; font-size:18px">{{ text }}</span>
-        <span style="font-size:0.7rem; padding-left: 2px">{{ getFiat(record.fiat_method) }}</span>
+        <span style="font-size:0.7rem; padding-left: 2px">{{
+          getFiat(record.fiat_method)
+        }}</span>
       </template>
 
       <template slot="limit" slot-scope="text, record">
@@ -54,7 +57,7 @@
         </li>
       </template>
 
-      <template slot="action" slot-scope="text , record, index">
+      <template slot="action" slot-scope="text, record, index">
         <a-button
           type="primary"
           @click="
@@ -90,7 +93,12 @@
       @close="onClose"
     >
       <a-row :gutter="16">
-        <p style="font-weight:bold;" class="image-responsive-lg image-responsive-md image-responsive-sm">{{ $t('drawerinfo') }}:</p>
+        <p
+          style="font-weight:bold;"
+          class="image-responsive-lg image-responsive-md image-responsive-sm"
+        >
+          {{ $t("drawerinfo") }}:
+        </p>
         <a-col :xxl="24" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
           <p style="font-size: 16px; font-weight: bold;">
             {{ $t("terms") }}
@@ -115,13 +123,17 @@
             <a-col :xxl="12" :xl="12" :lg="12" :md="24" :sm="24" :xs="24">
               <p style="color:gray; font-size: 14px">
                 {{ $t("paymenttimelimit") }}:
-                <span style="color:black; font-size: 16px">{{ time }} {{ $t("minutes") }}</span>
+                <span style="color:black; font-size: 16px"
+                  >{{ time }} {{ $t("minutes") }}</span
+                >
               </p>
             </a-col>
             <a-col :xxl="12" :xl="12" :lg="12" :md="24" :sm="24" :xs="24">
               <p style="color:gray; font-size: 14px">
                 {{ $t("price") }}:
-                <span style="color:rgb(218, 25, 25); font-size: 16px">{{ price }} {{ fiat }}</span>
+                <span style="color:rgb(218, 25, 25); font-size: 16px"
+                  >{{ price }} {{ fiat }}</span
+                >
               </p>
             </a-col>
             <a-col :xxl="12" :xl="12" :lg="12" :md="24" :sm="24" :xs="24">
@@ -133,8 +145,14 @@
             <a-col :xxl="12" :xl="12" :lg="12" :md="24" :sm="24" :xs="24">
               <p style="color:gray; font-size: 14px">
                 {{ $t("payments") }}:
-                <span v-for="item in listPayments" :key="item.id" style="color:green"> {{ item.payment_method }}</span>
-              </p>  
+                <span
+                  v-for="item in listPayments"
+                  :key="item.id"
+                  style="color:green"
+                >
+                  {{ item.payment_method }}</span
+                >
+              </p>
             </a-col>
           </a-row>
         </a-col>
@@ -198,7 +216,7 @@
                       :sm="24"
                       :xs="24"
                     >
-                      <a-form-item :label="$t('sellNEAR')">
+                      <a-form-item :label="buttonText">
                         <a-input-number
                           style="width:100%"
                           @change="onChangeToken"
@@ -256,7 +274,9 @@
                       :sm="24"
                       :xs="24"
                     >
-                      <a-button block @click="payment">{{ $t("method") }}</a-button>
+                      <a-button block @click="payment">{{
+                        $t("method")
+                      }}</a-button>
                     </a-col>
                     <a-col
                       :xxl="24"
@@ -318,7 +338,7 @@
                       :sm="24"
                       :xs="24"
                     >
-                      <a-form-item :label="$t('sellNEAR')">
+                      <a-form-item :label="buttonText">
                         <p
                           style="font-size: 16px; color: black; font-weigth: bold; margin-left:30px"
                         >
@@ -397,10 +417,10 @@
 
 <script>
 import * as nearAPI from "near-api-js";
-import { CONFIG } from "@/services/api";
+import { CONFIG, MAIL } from "@/services/api";
 import { mapGetters } from "vuex";
 const { connect, keyStores, WalletConnection, Contract, utils } = nearAPI;
-import moment from 'moment';
+import moment from "moment";
 
 export default {
   name: "CountriesTable",
@@ -412,33 +432,25 @@ export default {
           title: this.$t("advertisers"),
           dataIndex: "owner_id",
           key: "owner_id",
-          defaultSortOrder: "ascend",
-          sorter: (a, b) => a.owner_id.localeCompare(b.owner_id),
+          defaultSortOrder: "descend",
           scopedSlots: { customRender: "merchants" }
         },
         {
           title: this.$t("price"),
           dataIndex: "exchange_rate",
           key: "exchange_rate",
-          defaultSortOrder: "ascend",
-          sorter: (a, b) => a.asset.localeCompare(b.asset),
           scopedSlots: { customRender: "exchange_rate" }
         },
         {
           title: this.$t("limitavailable"),
           dataIndex: "remaining_amount",
           key: "remaining_amount",
-          defaultSortOrder: "ascend",
-          sorter: (a, b) =>
-            a.remaining_amount.localeCompare(b.remaining_amount),
           scopedSlots: { customRender: "limit" }
         },
         {
           title: this.$t("payment"),
           dataIndex: "payment_method",
           key: "payment_method",
-          defaultSortOrder: "ascend",
-          sorter: (a, b) => a.amount.localeCompare(b.amount),
           scopedSlots: { customRender: "payment_method" }
         },
         {
@@ -478,7 +490,7 @@ export default {
       fiat: "",
       form: this.$form.createForm(this),
       all: "",
-      fee: 0.003,
+      fee: 0.004,
       price: 0,
       min: 0,
       max: 0,
@@ -501,6 +513,7 @@ export default {
       filter_payment_method: null,
       filter_is_merchant: true,
       drawertittle: this.$t("drawertittle"),
+      user_mail: ""
     };
   },
   async mounted() {
@@ -508,10 +521,8 @@ export default {
     this.fetch();
     this.getBalance();
   },
-  beforeMount() {
-    if(localStorage.getItem("accepted_order")){
-      this.$router.push({ path: '/d/trade/detail', replace: true })
-    }
+  beforeDestroy() {
+     clearInterval(this.polling);
   },
   computed: {
     ...mapGetters("account", ["userInfo"]),
@@ -565,7 +576,7 @@ export default {
       // console.log(near);
       const contract = new Contract(wallet.account(), CONTRACT_NAME, {
         viewMethods: ["get_offers_sell", "get_offers_buy", "get_fiat_method"],
-        changeMethods: ["set_payment_method"],
+        changeMethods: [],
         sender: wallet.account()
       });
       var merchant = true;
@@ -593,10 +604,9 @@ export default {
           });
           this.buttonText = this.$t("buyNEAR");
         }
-        for (var i = 0; i < this.data.length; i++) { 
-            await this.getMerchants(this.data[i].owner_id);     
+        for (var i = 0; i < this.data.length; i++) {
+          await this.getMerchants(this.data[i].owner_id);
         }
-        //console.log(this.merchants);
         this.loading = false;
       }
     },
@@ -620,7 +630,11 @@ export default {
           user_id: user_id
         });
       }
-      this.merchants.push({ badge: merchants[0].badge, orders_completed: merchants[0].orders_completed, percentaje_completion: merchants[0].percentaje_completion}); 
+      this.merchants.push({
+        badge: merchants[0].badge,
+        orders_completed: merchants[0].orders_completed,
+        percentaje_completion: merchants[0].percentaje_completion.toFixed(2)
+      });
     },
     async acceptOrder() {
       this.$message.success(this.$t("pc"));
@@ -635,25 +649,45 @@ export default {
       const wallet = new WalletConnection(near);
       // console.log(near);
       const contract = new Contract(wallet.account(), CONTRACT_NAME, {
+        viewMethods: ["get_user"],
         changeMethods: ["accept_offer"],
         sender: wallet.account()
       });
-      var offer_type = 1;
-      if (this.typeoffer == "sell") {
-        offer_type = 1;
-      } else {
-        offer_type = 2;
-      }
+      var offer_type = null;
+      var mail_info = "";
       var offer_id = parseInt(this.offer_id);
       var amount = Number(this.totalremaining_amount);
       var payment_method = parseInt(this.payment_method);
+      var vlamount = "0";
       //Clear variables from localstorage
       localStorage.removeItem("wallet_balance");
       localStorage.removeItem("receive");
       localStorage.removeItem("remaining_amount");
-      localStorage.setItem("accepted_order", true);
-      var now = moment().format("YYYY-MM-DD HH:mm:ss").toString();
-      if (wallet.isSignedIn()) {      
+      if (this.typeoffer == "sell") {
+        offer_type = 1;
+        mail_info = "buy";
+        vlamount = this.NEARyoctoNEAR(this.totalremaining_amount);
+      } else {
+        offer_type = 2;
+        mail_info = "buy";
+        vlamount = "1";
+      }
+      var now = moment()
+        .format("YYYY-MM-DD HH:mm:ss")
+        .toString();
+      if (wallet.isSignedIn()) {
+        this.user_mail = await contract.get_user({
+          user_id: this.owner_id
+        });
+        //console.log(this.user_mail[0].email);
+        if (this.user_mail[0].email != "") {
+          var request = new XMLHttpRequest();
+          request.open(
+            "GET",
+            MAIL + this.user_mail[0].email + "/0/" + mail_info
+          );
+          request.send();
+        }
         await contract.accept_offer(
           {
             offer_type: offer_type,
@@ -663,7 +697,7 @@ export default {
             datetime: now
           },
           "300000000000000", // attached GAS (optional)
-          this.NEARyoctoNEAR(this.totalremaining_amount) // attached deposit in yoctoNEAR (optional)
+          vlamount // attached deposit in yoctoNEAR (optional)
         );
       }
     },
@@ -814,7 +848,10 @@ export default {
     },
     paymentHandleChange(value) {
       localStorage.setItem("payment_method", this.listPayments[value].id);
-      localStorage.setItem("payment_method_desc", this.listPayments[value].payment_method);
+      localStorage.setItem(
+        "payment_method_desc",
+        this.listPayments[value].payment_method
+      );
       this.payment_method = localStorage.getItem("payment_method");
       this.payment_method_desc = localStorage.getItem("payment_method_desc");
     },
@@ -824,9 +861,15 @@ export default {
         .filter(fiat => fiat.id == value)[0]
         .fiat_method.split(" - ")[0];
     },
-    payment(){
+    payment() {
       this.$router.push({ path: "/account/bank" });
-    }
+    },
+    pollData() {
+      this.polling = setInterval(() => {
+        this.fetch();
+      }, 60000);
+    },
+    
   }
 };
 </script>

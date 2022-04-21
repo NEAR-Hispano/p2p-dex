@@ -42,7 +42,7 @@ module.exports = {
       max: 'Max',
       terms: 'Términos y condiciones',
       receive: 'Monto a recibir',
-      fee: 'Cuota por transacción 0.3%',
+      fee: 'Cuota por transacción 0.4%',
       method: 'Crear método de pago',
       next: 'Próximo',
       previous: 'Previo',
@@ -60,6 +60,7 @@ module.exports = {
       minutes: 'Minutos',
       drawertittle: 'Agregar nueva oferta',
       drawerinfo: 'Llene la forma para completar la tares',
+      explorer: 'Verificar transacción en el explorador',
     },
     US: {
       pageDesc: 'Peer-to-peer exchange (or P2P exchange) is a marketplace where people can trade crypto directly with each other on their own terms, in any country.',
@@ -103,7 +104,7 @@ module.exports = {
       max: 'Max',
       terms: 'Terms and conditions',
       receive: 'Receive amount',
-      fee: 'Transaction fee 0.3%',
+      fee: 'Transaction fee 0.4%',
       method: 'Set payment method',
       next: 'Next',
       previous: 'Previous',
@@ -121,6 +122,7 @@ module.exports = {
       minutes: 'Minutes',
       drawertittle: 'Add New Offer',
       drawerinfo: 'Fill the form to complete the task',
+      explorer: 'Check transaction in explorer',
     }
   }
 }
