@@ -42,7 +42,7 @@
           title="Help documentation"
           placement="bottom"
         >
-          <a href="https://iczer.gitee.io/vue-antd-admin-docs/" target="_blank">
+          <a href="https://github.com/dvconsultores/nearp2p/wiki" target="_blank">
             <a-icon
               type="question-circle-o"
               style="padding-left:20px; font-size: 16px;"

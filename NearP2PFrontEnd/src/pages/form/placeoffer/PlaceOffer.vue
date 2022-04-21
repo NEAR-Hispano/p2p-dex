@@ -33,36 +33,6 @@
           <a-col :xxl="24" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
             <a-tabs default-active-key="1" @change="callback">
               <a-tab-pane key="buy" :tab="buy">
-                <a-form-item :label="$t('status')">
-                  <a-select
-                    show-search
-                    :placeholder="select"
-                    option-filter-prop="children"
-                    @change="handleChangeFilter"
-                    class="select-responsive-lg select-responsive-md select-responsive-sm select-responsive-xs"
-                    v-decorator="[
-                      'value',
-                      {
-                        rules: [
-                          { required: true, message: $t('requiredfield') }
-                        ]
-                      }
-                    ]"
-                  >
-                    <a-select-option value="1">
-                      {{ $t("open") }}
-                    </a-select-option>
-                    <a-select-option value="2">
-                      {{ $t("close") }}
-                    </a-select-option>
-                    <a-select-option value="3">
-                      {{ $t("ondiput") }}
-                    </a-select-option>
-                    <a-select-option value="4">
-                      {{ $t("canceled") }}
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
                 <a-table
                   :columns="columns"
                   :data-source="databuy"
@@ -71,6 +41,15 @@
                   <template slot="status" slot-scope="text, record">
                     <span>{{ statusOrder(record.status) }}</span>
                   </template>
+
+                  <template slot="amount" slot-scope="text, record">
+                    <span>{{ yoctoNEARNEAR(record.amount) }}</span>
+                  </template>
+
+                  <template slot="remaining_amount" slot-scope="text, record">
+                    <span>{{ yoctoNEARNEAR(record.remaining_amount) }}</span>
+                  </template>
+
 
                   <span slot="action" slot-scope="record">
                     <a @click="edit(record.offer_id)">
@@ -113,36 +92,6 @@
                 </a-table>
               </a-tab-pane>
               <a-tab-pane key="sell" :tab="sell">
-                <a-form-item :label="$t('status')">
-                  <a-select
-                    show-search
-                    :placeholder="select"
-                    option-filter-prop="children"
-                    @change="handleChangeFilter"
-                    class="select-responsive-lg select-responsive-md select-responsive-sm select-responsive-xs"
-                    v-decorator="[
-                      'value',
-                      {
-                        rules: [
-                          { required: true, message: $t('requiredfield') }
-                        ]
-                      }
-                    ]"
-                  >
-                    <a-select-option value="1">
-                      {{ $t("open") }}
-                    </a-select-option>
-                    <a-select-option value="2">
-                      {{ $t("close") }}
-                    </a-select-option>
-                    <a-select-option value="3">
-                      {{ $t("ondiput") }}
-                    </a-select-option>
-                    <a-select-option value="4">
-                      {{ $t("canceled") }}
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
                 <a-table
                   :columns="columns"
                   :data-source="data"
@@ -280,7 +229,7 @@
                 v-decorator="[
                   'amount',
                   {
-                    rules: [{ required: true, message: $t('requiredfield') }]
+                    rules: [{ validator: validateRemaining }]
                   }
                 ]"
                 :placeholder="amount"
@@ -381,11 +330,11 @@
         <a-row type="flex">
           <a-col :xxl="24" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
             <a-form-item :label="$t('time')" style="margin-top:5px">
-              <a-input-number
+              <a-input-number 
                 v-decorator="[
                   'time',
                   {
-                    rules: [{ required: true, message: $t('requiredfield') }]
+                    rules: [{ validator: validateNumber , message: $t('integer') }]
                   }
                 ]"
                 :placeholder="$t('time')"
@@ -494,11 +443,14 @@ export default {
       data: [],
       editform: [],
       listMechants: [],
+      user: [],
       percentage_complete: "0",
       status: 1,
       update: false,
       listFiats: [],
       databuy: [],
+      disputesell: [],
+      disputebuy: [],
       opc: "buy",
       listPayments: [],
       loading: false,
@@ -519,17 +471,23 @@ export default {
       selectfiat: this.$t("selectfiat"),
       form: this.$form.createForm(this),
       visible: false,
-      drawertittle: this.$t("drawertittle")
+      drawertittle: this.$t("drawertittle"),
+      numberRule: v  => {
+      if (!v.trim()) return true;
+      if (!isNaN(parseFloat(v)) && v >= 0 && v <= 999) return true;
+      return 'Number has to be between 0 and 999';
+    },
     };
   },
   mounted() {
     this.fetch();
+
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
 
     if (urlParams.get('transactionHashes') !== null) {
       this.success(process.env.VUE_APP_API_BASE_URL_EXPLORER + urlParams.get('transactionHashes'));
-      window.history.pushState({}, document.title, "/nearp2p/#/trade/offer");
+      history.replaceState(null, location.href.split("?")[0], '/#/trade/offer');
     }
   },
   methods: {
@@ -553,7 +511,8 @@ export default {
           "get_payment_method",
           "get_offers_sell",
           "get_offers_buy",
-          "get_merchant"
+          "get_merchant",
+          "get_user"
         ],
         changeMethods: [],
         sender: wallet.account()
@@ -573,6 +532,14 @@ export default {
         this.orderssell = await contract.get_order_sell({
           signer_id: this.userInfo
         });
+
+        this.user = await contract.get_user({
+            user_id: this.userInfo,
+        });
+        if(this.user.length == 0){
+          this.$router.push("/account/myaccount");
+        }
+
         this.ordersbuy = await contract.get_order_buy({
           signer_id: this.userInfo
         });
@@ -582,9 +549,24 @@ export default {
         this.listMechants = await contract.get_merchant({
             user_id: this.userInfo,
         });
-        this.percentage_complete = this.listMechants[0].percentage_complete;  
+        this.percentage_complete = this.listMechants[0].percentaje_completion.toFixed(2) + '%';  
       }
+      this.checkDispute();
       this.loading = false;
+    },
+    validateNumber(rule, value, callback) {
+      if (!/^[1-9]\d*$|^$/.test(value) || value > 1440) {
+        callback(this.$t("integer"));
+      } else {
+        callback();
+      }
+    },
+    validateRemaining(rule, value, callback) {
+      if (value > this.editform[0].amount) {
+        callback(this.$t("requiredremaining"));
+      } else {
+        callback();
+      }
     },
     callback(key) {
       this.opc = key;
@@ -655,10 +637,11 @@ export default {
       payment_method,
       fiat_method,
       time,
-      terms_conditions
+      terms_conditions,
     ) {
       this.$message.success(this.$t("pc"));
       this.amount = this.$t('amount');
+      var attached_deposit = "1";
       //this.loading = true;
       // connect to NEAR
       const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME;
@@ -673,6 +656,7 @@ export default {
         changeMethods: ["set_offers_sell", "set_offers_buy", "put_offers_sell", "put_offers_buy"],
         sender: wallet.account()
       });
+      //console.log(this.opc);
       if (wallet.isSignedIn()) {
         if (this.opc == "buy" && this.update == false) {         
           await contract.set_offers_sell(
@@ -697,7 +681,7 @@ export default {
               owner_id: this.userInfo,
               asset: asset.toString(),
               exchange_rate: exchange_rate.toString(),
-              amount: parseFloat(amount),
+              amount: Number(amount),
               min_limit: parseFloat(min_limit),
               max_limit: parseFloat(max_limit),
               payment_method: eval(payment_method),
@@ -706,7 +690,7 @@ export default {
               terms_conditions: terms_conditions.toString()
             },
             "300000000000000", // attached GAS (optional)
-            "1" // attached deposit in yoctoNEAR (optional)
+            this.NEARyoctoNEAR(Number(amount)) // attached deposit in yoctoNEAR (optional)
           );
         } else if (this.opc == "buy" && this.update == true) {  
           await contract.put_offers_sell(
@@ -726,6 +710,12 @@ export default {
             "1" // attached deposit in yoctoNEAR (optional)
           );
         } else if (this.opc == "sell" && this.update == true) {  
+          //verify if the user needs to atach new doposit
+          if(amount > this.data[0].remaining_amount){
+            attached_deposit = this.NEARyoctoNEAR(parseFloat(amount) - parseFloat(this.editform[0].remaining_amount));
+          } else {
+            attached_deposit = "1";
+          }
           await contract.put_offers_buy(
             {
               offer_id: this.updateid,
@@ -740,11 +730,11 @@ export default {
               terms_conditions: terms_conditions.toString()
             },
             "300000000000000", // attached GAS (optional)
-            "1" // attached deposit in yoctoNEAR (optional)
+            attached_deposit // attached deposit in yoctoNEAR (optional)
           );
         }
       }
-      this.opc = "buy";
+      //this.opc = "buy";
     },
     async delete_offer(
       offer_id
@@ -778,6 +768,7 @@ export default {
             },
           );
         }
+        
         this.fetch();
       }
     },
@@ -855,6 +846,7 @@ export default {
     },
     handleChange(value) {
       this.opc = value;
+      //console.log(value)
     },
     handleChangeFilter(value) {
       this.status = value;
@@ -900,6 +892,86 @@ export default {
         ),
       });
     },
+    yoctoNEARNEAR: function(yoctoNEAR) {
+      const { utils } = nearAPI;
+      const amountInNEAR = utils.format.formatNearAmount(yoctoNEAR.toString());
+      // console.log(amountInNEAR);
+      return amountInNEAR.toString();
+    },
+    NEARyoctoNEAR: function(NEARyocto) {
+      const { utils } = nearAPI;
+      const amountInYocto = utils.format.parseNearAmount(NEARyocto.toString());
+      // console.log(amountInYocto);
+      return amountInYocto.toString();
+    },
+     /*This function searchs in order sell and order buy first from owner_id then signer_id, if ther is a dispute estatus redirect*/
+    async checkDispute(){
+      const { connect, keyStores, WalletConnection, Contract } = nearAPI;
+      // connect to NEAR
+      const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME;
+      const near = await connect(
+        CONFIG(new keyStores.BrowserLocalStorageKeyStore())
+      );
+      // create wallet connection
+      // const account = await near.account();
+      const wallet = new WalletConnection(near);
+      // console.log(near);
+      const contract = new Contract(wallet.account(), CONTRACT_NAME, {
+        viewMethods: [
+          "get_order_sell",
+          "get_order_buy",
+        ],
+        changeMethods: [],
+        sender: wallet.account()
+      });
+      if (wallet.isSignedIn()) {
+      //Getting info from owner_id and status 3, buy and sell
+      //Getting info from owner_id and status 3, buy and sell
+      ////////////////////////////////////////////////////////
+      this.disputebuy = await contract.get_order_buy({
+            owner_id: this.userInfo,
+            status: 3
+      });
+      this.disputesell = await contract.get_order_sell({
+            owner_id: this.userInfo,
+            status: 3
+      });
+      //If there is a dispute got to detail in buy or sell
+        for(var i = 0; i < this.disputebuy.length; i++){
+          if(this.disputebuy[i].status == 3 && this.disputebuy[i].owner_id == this.userInfo){
+            this.$router.push("/trade/merchant");
+          } 
+        }
+        for(var x = 0; x < this.disputesell.length; x++){
+          if(this.disputesell[x].status == "3" && this.disputesell[i].owner_id == this.userInfo){
+           this.$router.push("/trade/merchant");
+          }
+        }
+      ////////////////////////////////////////////////////////
+      //Repeat all get but using signer id
+      //Getting info from signer_id and status 3, buy and sell
+      ////////////////////////////////////////////////////////
+      this.disputebuy = await contract.get_order_buy({
+            signer_id: this.userInfo,
+            status: 3
+      });
+      this.disputesell = await contract.get_order_sell({
+            signer_id: this.userInfo,
+            status: 3
+      });
+      //If there is a dispute got to detail in buy or sell
+        for(var y = 0; y < this.disputebuy.length; y++){
+          if(this.disputebuy[y].status == 3 && this.disputebuy[y].signer_id == this.userInfo){
+            this.$router.push("/trade/p2pdetail");
+          } 
+        }
+        for(var z = 0; z < this.disputesell.length; z++){
+          if(this.disputesell[z].status == "3" && this.disputesell[z].signer_id == this.userInfo){
+           this.$router.push("/trade/p2pdetail");
+          }
+        }
+      }//Check signein
+    }
   }
 };
 </script>

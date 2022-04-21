@@ -28,8 +28,11 @@ module.exports = {
     direction: 'left'                   //Animation direction, the direction of the animation when switching pages, reference ./animate.config.js
   },
   footerLinks: [                        //Link at the bottom of the page, 'link: 'Link Address', name: 'Name/Display Text', icon: 'Icon, support for ant design vue icon library'.
-    {link: 'https:www.dvconsultores.com', name: 'GlobalDv'},
-    {link: 'https://github.com/iczer/vue-antd-admin', icon: 'github'},
-    {link: 'https://ant.design', name: 'NEAR'}
+    {link: 'http://dvconsultores.com/', name: 'GlobalDv'},
+    {link: 'https://github.com/dvconsultores/nearp2p', icon: 'github'},
+    {link: 'mailto:admin@p2p.com', icon: 'mail'},
+    {link: 'https://near.org/', name: 'NEAR'},
+    {link: 'https://t.me/nearp2p', name: 'Telegram'},
+    {link: 'https://nearp2p.com/legal/Series_Operating_Agreement.pdf', name: ' Series Operating Agreement', icon: 'file-pdf'},
   ],
 }

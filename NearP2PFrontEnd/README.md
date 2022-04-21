@@ -7,4 +7,4 @@ NETWORK: Testnet
 
 Check partial demo online:
 
-http://157.230.2.213/nearp2p/#/login
+http://nearp2p.com/#/login

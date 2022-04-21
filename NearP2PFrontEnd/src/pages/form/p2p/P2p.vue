@@ -144,6 +144,8 @@ export default {
       listFiats: [],
       orderssell: [],
       ordersbuy: [],
+      disputesell: [],
+      disputebuy: [],
       active_orders: "0",
       listMechants: [],
       percentage_complete: "0",
@@ -157,21 +159,23 @@ export default {
       globalkey: "1",
       title: this.$t("title"),
       search: this.$t("search"),
-      amount: ""
+      amount: "",
+      user: [],
     };
   },
   mounted() {
     this.fetchSelects();
-
-    if(localStorage.getItem("userlength") == 0){
-      this.$router.push("/account/myaccount");
-    }
-
+  
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
 
-    if (urlParams.get('transactionHashes') !== null) {
-      window.history.pushState({}, document.title, "/nearp2p/#/trade/p2p");
+    if (urlParams.get("transactionHashes") !== null) {
+      this.success(
+        process.env.VUE_APP_API_BASE_URL_EXPLORER +
+          urlParams.get("transactionHashes")
+      );
+      history.replaceState(null, location.href.split("?")[0], '/#/trade/p2p');
+      //window.history.pushState({});
     }
   },
   methods: {
@@ -240,7 +244,8 @@ export default {
           "get_fiat_method",
           "get_merchant",
           "get_order_sell",
-          "get_order_buy"
+          "get_order_buy",
+          "get_user",
         ],
         changeMethods: ["set_payment_method"],
         sender: wallet.account()
@@ -256,6 +261,14 @@ export default {
         this.orderssell = await contract.get_order_sell({
             signer_id: this.userInfo,
         });
+   
+        this.user = await contract.get_user({
+            user_id: this.userInfo,
+        });
+        if(this.user.length == 0){
+          this.$router.push("/account/myaccount");
+        }
+
         this.ordersbuy = await contract.get_order_buy({
             signer_id: this.userInfo,
         });
@@ -263,10 +276,99 @@ export default {
         this.listMechants = await contract.get_merchant({
             user_id: this.userInfo,
         });
-        this.percentage_complete = this.listMechants[0].percentage_complete;
+        this.percentage_complete = this.listMechants[0].percentaje_completion.toFixed(2) + '%';
 
         this.active_orders = parseInt(this.orderssell.length) + parseInt(this.ordersbuy.length);
+
+        this.checkDispute();
       }
+    },
+    success(url) {
+      //console.log(url);
+      this.url = url;
+      this.message = this.$t("explorer");
+      //var dir = process.env.NEAR_EXPLORER + url
+      this.$success({
+        title: "LOG",
+        // JSX support
+        content: (
+          <div>
+            <p>
+              <a href={this.url} target="_blank">
+                {this.message}
+              </a>
+            </p>
+          </div>
+        )
+      });
+    },
+    /*This function searchs in order sell and order buy first from owner_id then signer_id, if ther is a dispute estatus redirect*/
+    async checkDispute(){
+      const { connect, keyStores, WalletConnection, Contract } = nearAPI;
+      // connect to NEAR
+      const CONTRACT_NAME = process.env.VUE_APP_CONTRACT_NAME;
+      const near = await connect(
+        CONFIG(new keyStores.BrowserLocalStorageKeyStore())
+      );
+      // create wallet connection
+      // const account = await near.account();
+      const wallet = new WalletConnection(near);
+      // console.log(near);
+      const contract = new Contract(wallet.account(), CONTRACT_NAME, {
+        viewMethods: [
+          "get_order_sell",
+          "get_order_buy",
+        ],
+        changeMethods: [],
+        sender: wallet.account()
+      });
+      if (wallet.isSignedIn()) {
+      //Getting info from owner_id and status 3, buy and sell
+      //Getting info from owner_id and status 3, buy and sell
+      ////////////////////////////////////////////////////////
+      this.disputebuy = await contract.get_order_buy({
+            owner_id: this.userInfo,
+            status: 3
+      });
+      this.disputesell = await contract.get_order_sell({
+            owner_id: this.userInfo,
+            status: 3
+      });
+      //If there is a dispute got to detail in buy or sell
+        for(var i = 0; i < this.disputebuy.length; i++){
+          if(this.disputebuy[i].status == 3 && this.disputebuy[i].owner_id == this.userInfo){
+            this.$router.push("/trade/merchant");
+          } 
+        }
+        for(var x = 0; x < this.disputesell.length; x++){
+          if(this.disputesell[x].status == "3" && this.disputesell[i].owner_id == this.userInfo){
+           this.$router.push("/trade/merchant");
+          }
+        }
+      ////////////////////////////////////////////////////////
+      //Repeat all get but using signer id
+      //Getting info from signer_id and status 3, buy and sell
+      ////////////////////////////////////////////////////////
+      this.disputebuy = await contract.get_order_buy({
+            signer_id: this.userInfo,
+            status: 3
+      });
+      this.disputesell = await contract.get_order_sell({
+            signer_id: this.userInfo,
+            status: 3
+      });
+      //If there is a dispute got to detail in buy or sell
+        for(var y = 0; y < this.disputebuy.length; y++){
+          if(this.disputebuy[y].status == 3 && this.disputebuy[y].signer_id == this.userInfo){
+            this.$router.push("/trade/p2pdetail");
+          } 
+        }
+        for(var z = 0; z < this.disputesell.length; z++){
+          if(this.disputesell[z].status == "3" && this.disputesell[z].signer_id == this.userInfo){
+           this.$router.push("/trade/p2pdetail");
+          }
+        }
+      }//Check signein
     }
   }
 };
